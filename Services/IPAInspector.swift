@@ -69,6 +69,12 @@ enum IPAInspector {
                 }
             }
         }
+        for fallback in ["Icon.png", "icon.png", "Icon@2x.png", "AppIcon60x60@3x.png", "AppIcon60x60@2x.png", "AppIcon76x76@2x~ipad.png", "iTunesArtwork.png"] {
+            let url = appDir.appendingPathComponent(fallback)
+            if FileManager.default.fileExists(atPath: url.path) {
+                return url
+            }
+        }
         return nil
     }
 }

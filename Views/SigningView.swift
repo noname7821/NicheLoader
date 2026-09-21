@@ -36,11 +36,34 @@ struct SigningView: View {
                         Text("No certificate yet. Add one in Settings first.")
                             .foregroundStyle(.secondary)
                     } else {
-                        Picker("Certificate", selection: $certificateID) {
-                            Text("Select").tag(nil as String?)
-                            ForEach(store.certificates) { cert in
-                                Text(cert.name).tag(cert.id as String?)
+                        ForEach(store.certificates) { cert in
+                            Button {
+                                withAnimation { certificateID = cert.id }
+                            } label: {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(cert.name)
+                                            .font(.headline)
+                                            .foregroundStyle(.primary)
+                                        if let info = store.profileInfo(for: cert) {
+                                            Text(info.teamName)
+                                                .font(.subheadline)
+                                                .foregroundStyle(.secondary)
+                                        }
+                                    }
+                                    Spacer()
+                                    if certificateID == cert.id {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundStyle(.purple)
+                                            .font(.title3)
+                                    } else {
+                                        Image(systemName: "circle")
+                                            .foregroundStyle(.secondary)
+                                            .font(.title3)
+                                    }
+                                }
                             }
+                            .buttonStyle(.plain)
                         }
                     }
                 }

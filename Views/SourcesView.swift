@@ -153,14 +153,27 @@ private struct RepoMenuView: View {
                         isPresented = false
                     } label: {
                         HStack(spacing: 12) {
-                            AsyncImage(url: source.iconURL) { image in
-                                image.resizable()
-                            } placeholder: {
-                                Image(systemName: "globe.desk.fill")
-                                    .foregroundStyle(.purple)
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 11)
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [.purple.opacity(0.25), .purple.opacity(0.08)],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                                    .frame(width: 46, height: 46)
+                                AsyncImage(url: source.iconURL) { image in
+                                    image
+                                        .resizable()
+                                        .frame(width: 46, height: 46)
+                                        .clipShape(RoundedRectangle(cornerRadius: 11))
+                                } placeholder: {
+                                    Image(systemName: "globe.desk.fill")
+                                        .font(.system(size: 22))
+                                        .foregroundStyle(.purple)
+                                }
                             }
-                            .frame(width: 44, height: 44)
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(source.name).font(.headline)
                                 Text("\(source.apps.count) apps")
@@ -198,7 +211,7 @@ private struct RepoMenuView: View {
 struct SourcesView: View {
     @StateObject private var model = SourcesModel()
     @State private var newURL = ""
-    @State private var newName = ""
+    @State private var showAddSource = false
     @State private var downloading: String?
     @State private var downloadNotice: String?
     @State private var showRepos = false
@@ -207,20 +220,6 @@ struct SourcesView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section("Add source") {
-                    TextField("Name", text: $newName)
-                    TextField("https://…", text: $newURL)
-                        .textInputAutocapitalization(.never)
-                    Button("Add") {
-                        let cleaned = newURL.trimmingCharacters(in: .whitespacesAndNewlines)
-                        guard let url = URL(string: cleaned) else { return }
-                        withAnimation { model.add(url: url, name: newName) }
-                        newURL = ""
-                        newName = ""
-                    }
-                    .disabled(newURL.isEmpty)
-                }
-                .animation(.default, value: model.sources)
                 ForEach(visibleSources) { source in
                     Section(source.name) {
                         if source.failed {
@@ -229,19 +228,34 @@ struct SourcesView: View {
                             Text("No apps found.").foregroundStyle(.secondary)
                         }
                         ForEach(source.apps) { app in
-                            HStack(spacing: 10) {
-                                AsyncImage(url: app.iconURL) { image in
-                                    image.resizable()
-                                } placeholder: {
-                                    Image(systemName: "app.fill")
-                                        .foregroundStyle(.purple)
+                            HStack(spacing: 12) {
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 11)
+                                        .fill(
+                                            LinearGradient(
+                                                colors: [.purple.opacity(0.25), .purple.opacity(0.08)],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            )
+                                        )
+                                        .frame(width: 46, height: 46)
+                                    AsyncImage(url: app.iconURL) { image in
+                                        image
+                                            .resizable()
+                                            .frame(width: 46, height: 46)
+                                            .clipShape(RoundedRectangle(cornerRadius: 11))
+                                    } placeholder: {
+                                        Image(systemName: "app.fill")
+                                            .font(.system(size: 22))
+                                            .foregroundStyle(.purple)
+                                    }
                                 }
-                                .frame(width: 44, height: 44)
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                                VStack(alignment: .leading) {
-                                    Text(app.name).font(.headline)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(app.name).font(.headline).lineLimit(1)
                                     if !app.version.isEmpty {
-                                        Text("v\(app.version)").font(.subheadline).foregroundStyle(.secondary)
+                                        Text("v\(app.version)")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
                                     }
                                 }
                                 Spacer()
@@ -254,13 +268,7 @@ struct SourcesView: View {
                                     .tint(.purple)
                                 }
                             }
-                            .swipeActions {
-                                Button(role: .destructive) {
-                                    withAnimation { model.remove(source) }
-                                } label: {
-                                    Label("Remove source", systemImage: "trash")
-                                }
-                            }
+                            .padding(.vertical, 4)
                         }
                     }
                 }
@@ -270,6 +278,21 @@ struct SourcesView: View {
             .navigationBarItems(
                 leading: Button(action: { showRepos = true }) {
                     Image(systemName: "line.3.horizontal")
+                },
+                trailing: Button(action: { showAddSource = true }) {
+                    Image(systemName: "plus")
+                }
+                .alert("Add source", isPresented: $showAddSource) {
+                    TextField("https://…", text: $newURL)
+                        .textInputAutocapitalization(.never)
+                    Button("Add") {
+                        let cleaned = newURL.trimmingCharacters(in: .whitespacesAndNewlines)
+                        if let url = URL(string: cleaned) {
+                            withAnimation { model.add(url: url, name: "") }
+                        }
+                        newURL = ""
+                    }
+                    Button("Cancel", role: .cancel) { newURL = "" }
                 }
             )
             .refreshable { model.fetchAll() }

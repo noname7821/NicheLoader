@@ -13,10 +13,16 @@ struct AboutView: View {
         List {
             Section {
                 VStack(spacing: 8) {
-                    Image("AboutIcon")
-                        .resizable()
-                        .frame(width: 72, height: 72)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                    ZStack {
+                        Circle()
+                            .fill(.purple.opacity(0.25))
+                            .frame(width: 96, height: 96)
+                            .blur(radius: 18)
+                        Image("AboutIcon")
+                            .resizable()
+                            .frame(width: 72, height: 72)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                    }
                     Text("NicheLoader")
                         .font(.largeTitle)
                         .bold()

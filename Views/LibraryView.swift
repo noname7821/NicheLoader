@@ -108,19 +108,29 @@ private struct LibraryRowView: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            if let thumb = library.thumbnail(for: app),
-               let image = UIImage(contentsOfFile: thumb.path) {
-                Image(uiImage: image)
-                    .resizable()
-                    .frame(width: 52, height: 52)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-            } else {
-                Image(systemName: "app.fill")
-                    .font(.system(size: 40))
-                    .foregroundStyle(.purple)
-                    .frame(width: 52, height: 52)
+            ZStack {
+                RoundedRectangle(cornerRadius: 13)
+                    .fill(
+                        LinearGradient(
+                            colors: [.purple.opacity(0.25), .purple.opacity(0.08)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 54, height: 54)
+                if let thumb = library.thumbnail(for: app),
+                   let image = UIImage(contentsOfFile: thumb.path) {
+                    Image(uiImage: image)
+                        .resizable()
+                        .frame(width: 54, height: 54)
+                        .clipShape(RoundedRectangle(cornerRadius: 13))
+                } else {
+                    Image(systemName: "app.fill")
+                        .font(.system(size: 26))
+                        .foregroundStyle(.purple)
+                }
             }
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(app.displayName).font(.headline).lineLimit(1)
                 if !app.bundleID.isEmpty {
                     Text(app.bundleID)
@@ -128,9 +138,21 @@ private struct LibraryRowView: View {
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
-                Text(versionLine)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                HStack(spacing: 6) {
+                    if !app.version.isEmpty {
+                        Text("v\(app.version)")
+                            .font(.caption2)
+                            .bold()
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 2)
+                            .background(.purple.opacity(0.15))
+                            .foregroundStyle(.purple)
+                            .clipShape(Capsule())
+                    }
+                    Text(LibraryStore.formattedSize(app.size))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
             Spacer()
             if showsSignButton {
@@ -140,9 +162,11 @@ private struct LibraryRowView: View {
             } else {
                 ShareLink(item: app.url) {
                     Image(systemName: "square.and.arrow.up")
+                        .foregroundStyle(.purple)
                 }
             }
         }
+        .padding(.vertical, 4)
         .swipeActions {
             Button(role: .destructive) {
                 withAnimation {
@@ -156,12 +180,5 @@ private struct LibraryRowView: View {
                 Label("Delete", systemImage: "trash")
             }
         }
-    }
-
-    private var versionLine: String {
-        var parts: [String] = []
-        if !app.version.isEmpty { parts.append("v\(app.version)") }
-        parts.append(LibraryStore.formattedSize(app.size))
-        return parts.joined(separator: " · ")
     }
 }
