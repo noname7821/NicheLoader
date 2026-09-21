@@ -24,11 +24,7 @@ struct LibraryView: View {
                 }
             }
             .navigationTitle("Library")
-            .toolbar {
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    Button("Add", systemImage: "plus") { showImporter = true }
-                }
-            }
+            .navigationBarItems(trailing: Button("Add", systemImage: "plus") { showImporter = true })
             .fileImporter(isPresented: $showImporter, allowedContentTypes: [UTType(filenameExtension: "ipa") ?? .data]) { result in
                 if case .success(let url) = result {
                     library.importIPA(from: url)
