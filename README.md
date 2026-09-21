@@ -1,33 +1,49 @@
-# NicheLoader
+<p align="center">
+  <img src="icon.png" width="140" alt="NicheLoader">
+</p>
 
-![Build](https://github.com/noname7821/NicheLoader/actions/workflows/build.yml/badge.svg)
-![License](https://img.shields.io/badge/license-MIT-purple)
-![iOS](https://img.shields.io/badge/iOS-16.0+-purple)
-![Version](https://img.shields.io/badge/version-1.0.1-purple)
+<h1 align="center">NicheLoader</h1>
 
-On-device iOS signer by **mintoo**. Import your certificate once, then sign and
-install your own apps directly on your iPhone or iPad. No computer. No jailbreak.
+<p align="center">
+  <b>On-device iOS signer by mintoo.</b><br>
+  Import your certificate once — sign and install your own apps forever.<br>
+  No computer. No jailbreak. No cost.
+</p>
 
-## Features
-- Certificate import (.p12 + .mobileprovision, password in Keychain)
-- App library with one-tap signing screen
-- Custom name, identifier and version overrides
-- AltStore-compatible sources browser
-- Built-in file manager
-- Purple accent, fresh icon
+<p align="center">
+  <a href="https://github.com/noname7821/NicheLoader/actions/workflows/build.yml"><img src="https://github.com/noname7821/NicheLoader/actions/workflows/build.yml/badge.svg" alt="Build"></a>
+  <img src="https://img.shields.io/badge/license-MIT-purple" alt="License">
+  <img src="https://img.shields.io/badge/iOS-16.0+-purple" alt="iOS">
+  <img src="https://img.shields.io/badge/version-1.0.1-purple" alt="Version">
+</p>
+
+---
 
 ## Download
-Get the newest `NicheLoader.ipa` from
-[Releases](https://github.com/noname7821/NicheLoader/releases).
+
+Get the newest **`NicheLoader.ipa`** here:
+
+> ### [Releases →](https://github.com/noname7821/NicheLoader/releases)
+
+Install it directly on your iPhone with [**NicheLoader Site**](https://nicheloader-site.onrender.com/) open the link in Safari and tap Install. No computer needed.
+
+## Features
+
+| | What it does |
+|---|---|
+| Certificates | Import `.p12` + `.mobileprovision`, password stays in your Keychain |
+| Library | Import IPAs, one-tap signing screen |
+| Customization | Own app name, bundle identifier and version per signing |
+| Sources | Browse AltStore-compatible feeds right in the app |
+| Files | Built-in file browser for your documents |
+| Design | Fresh icon, purple accent, clean SwiftUI interface |
+
+## Screenshots
+
+_Coming soon — fresh screenshots of v1.0.1 will land here._
 
 ## Build it yourself
-Open `NicheLoader.xcodeproj` in Xcode 16+ and run on your device,
-or grab the IPA from the `Build IPA` workflow artifacts.
 
-## Credits
-- Solo Developer: [mintoo](https://github.com/noname7821)
-- Flow ideas inspired by [Ksign](https://github.com/Nyasami/Ksign) and
-  [Feather](https://github.com/khcrysalis/Feather) – all code here is written from scratch.
-
-## Help
-Open an [Issue](https://github.com/noname7821/NicheLoader/issues) for bugs or ideas.
+```bash
+# open in Xcode 16+ and run on your device
+open NicheLoader.xcodeproj
