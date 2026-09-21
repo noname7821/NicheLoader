@@ -87,14 +87,11 @@ struct InstallView: View {
                 installer.ipaURL = ipa
                 installer.iconData = icon
                 try installer.start()
-                guard let ip = DeviceIP.localAddress() else {
-                    throw InstallServerError.noPort
-                }
                 installer.manifestData = Data(manifest(
                     bundleID: app.identifier,
                     version: app.version.isEmpty ? "1.0" : app.version,
                     title: app.name,
-                    base: "http://\(ip):\(installer.port)"
+                    base: "http://127.0.0.1:\(installer.port)"
                 ).utf8)
                 installer.onPayloadServed = {
                     phase = .finished
@@ -116,8 +113,7 @@ struct InstallView: View {
 
     private func openInstaller() {
         guard let server, server.port != 0,
-              let ip = DeviceIP.localAddress(),
-              let url = URL(string: "itms-services://?action=download-manifest&url=http://\(ip):\(server.port)/manifest.plist") else {
+              let url = URL(string: "itms-services://?action=download-manifest&url=http://127.0.0.1:\(server.port)/manifest.plist") else {
             detail = "Could not build the install link."
             return
         }
