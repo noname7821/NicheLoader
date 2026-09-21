@@ -103,8 +103,7 @@ private struct CertificateAddView: View {
         }
         .fileImporter(
             isPresented: Binding(get: { pickerTarget != nil }, set: { if !$0 { pickerTarget = nil } }),
-            allowedContentTypes: [.data],
-            allowsMultipleSelection: false
+            allowedContentTypes: [.data]
         ) { result in
             guard let target = pickerTarget else { return }
             pickerTarget = nil
