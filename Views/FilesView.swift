@@ -3,7 +3,6 @@ import SwiftUI
 struct FilesView: View {
     @State private var current: URL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     @State private var entries: [FileEntry] = []
-    @State private var showImporter = false
     @State private var showNewFolder = false
     @State private var newFolderName = ""
     @State private var notice: String?
@@ -108,30 +107,32 @@ struct FilesView: View {
                             }
                             Button("Cancel", role: .cancel) { newFolderName = "" }
                         }
-                    Button("Add", systemImage: "plus") { showImporter = true }
-                }
-            }
-            .sheet(isPresented: $showImporter) {
-                DocumentPicker(types: [.item], allowsMultiple: true) { urls in
-                    showImporter = false
-                    var added = 0
-                    var lastError: String?
-                    for url in urls {
-                        do {
-                            try FileManager.default.copyItem(at: url, to: current.appendingPathComponent(url.lastPathComponent))
-                            added += 1
-                        } catch {
-                            lastError = error.localizedDescription
-                        }
-                    }
-                    notice = added == 0 ? (lastError.map { "Copy failed: \($0)" } ?? "Nothing selected.") : nil
-                    withAnimation { reload() }
-                } onCancel: {
-                    showImporter = false
+                    Button("Add", systemImage: "plus") { pickFiles() }
                 }
             }
             .onAppear(perform: reload)
         }
+    }
+
+    private func pickFiles() {
+        PickerPresenter.present(types: [.item], allowsMultiple: true) { urls in
+            importURLs(urls)
+        }
+    }
+
+    private func importURLs(_ urls: [URL]) {
+        var added = 0
+        var lastError: String?
+        for url in urls {
+            do {
+                try FileManager.default.copyItem(at: url, to: current.appendingPathComponent(url.lastPathComponent))
+                added += 1
+            } catch {
+                lastError = error.localizedDescription
+            }
+        }
+        notice = added == 0 ? (lastError.map { "Copy failed: \($0)" } ?? "Nothing selected.") : nil
+        withAnimation { reload() }
     }
 
     private var isDocumentRoot: Bool {

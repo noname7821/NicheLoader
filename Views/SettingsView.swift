@@ -71,23 +71,12 @@ private struct CertificateListView: View {
 
 private struct CertificateAddView: View {
     @EnvironmentObject private var store: CertificateStore
-    @State private var pickerTarget: PickTarget?
     @State private var pendingP12: URL?
     @State private var pendingProvision: URL?
     @State private var pendingInfo: ProvisionInfo?
     @State private var certName = ""
     @State private var certPassword = ""
     @State private var notice: String?
-
-    private enum PickTarget: Identifiable {
-        case p12, provision
-        var id: Int {
-            switch self {
-            case .p12: return 0
-            case .provision: return 1
-            }
-        }
-    }
 
     private var canSave: Bool {
         pendingP12 != nil && pendingProvision != nil &&
@@ -99,10 +88,14 @@ private struct CertificateAddView: View {
             TextField("Name", text: $certName)
             SecureField("P12 password", text: $certPassword)
             Button(pendingP12 == nil ? "Choose .p12 file" : "P12: \(pendingP12?.lastPathComponent ?? "")") {
-                pickerTarget = .p12
+                PickerPresenter.present(types: [.data], allowsMultiple: false) { urls in
+                    handlePicked(urls, target: .p12)
+                }
             }
             Button(pendingProvision == nil ? "Choose .mobileprovision file" : "Profile: \(pendingProvision?.lastPathComponent ?? "")") {
-                pickerTarget = .provision
+                PickerPresenter.present(types: [.data], allowsMultiple: false) { urls in
+                    handlePicked(urls, target: .provision)
+                }
             }
             if let info = pendingInfo {
                 VStack(alignment: .leading, spacing: 2) {
@@ -118,23 +111,13 @@ private struct CertificateAddView: View {
                 Text(notice).foregroundStyle(.secondary)
             }
         }
-        .sheet(
-            isPresented: Binding(get: { pickerTarget != nil }, set: { if !$0 { pickerTarget = nil } })
-        ) {
-            DocumentPicker(
-                types: [.data],
-                allowsMultiple: false
-            ) { urls in
-                handlePicked(urls)
-            } onCancel: {
-                pickerTarget = nil
-            }
-        }
     }
 
-    private func handlePicked(_ urls: [URL]) {
-        guard let target = pickerTarget else { return }
-        pickerTarget = nil
+    private enum PickTarget {
+        case p12, provision
+    }
+
+    private func handlePicked(_ urls: [URL], target: PickTarget) {
         guard let url = urls.first else { return }
         switch target {
         case .p12:

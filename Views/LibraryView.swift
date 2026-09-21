@@ -3,12 +3,32 @@ import UniformTypeIdentifiers
 
 struct LibraryView: View {
     @EnvironmentObject private var library: LibraryStore
-    @State private var showImporter = false
     @State private var signTarget: StoredApp?
     @State private var notice: String?
     @State private var tab = 0
     @State private var showExport = false
     @State private var exportURL: URL?
+
+    private func pickIPA() {
+        PickerPresenter.present(types: [.data], allowsMultiple: true) { urls in
+            var errors: [String] = []
+            var added = 0
+            for url in urls {
+                if let error = library.importIPA(from: url) {
+                    errors.append(error)
+                } else {
+                    added += 1
+                }
+            }
+            if added == 0 && errors.first != nil {
+                notice = errors.first
+            } else if added == 0 {
+                notice = "No .ipa file selected."
+            } else {
+                notice = nil
+            }
+        }
+    }
 
     var body: some View {
         NavigationStack {
@@ -41,7 +61,7 @@ struct LibraryView: View {
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                             if tab == 0 {
-                                Button("Import IPA") { showImporter = true }
+                                Button("Import IPA") { pickIPA() }
                                     .buttonStyle(.borderedProminent)
                                     .tint(.purple)
                                     .padding(.top, 4)
@@ -72,30 +92,7 @@ struct LibraryView: View {
             .animation(.default, value: library.unsignedApps)
             .animation(.default, value: library.signedApps)
             .navigationTitle("Library")
-            .navigationBarItems(trailing: Button("Add", systemImage: "plus") { showImporter = true })
-            .sheet(isPresented: $showImporter) {
-                DocumentPicker(types: [.data], allowsMultiple: true) { urls in
-                    showImporter = false
-                    var errors: [String] = []
-                    var added = 0
-                    for url in urls {
-                        if let error = library.importIPA(from: url) {
-                            errors.append(error)
-                        } else {
-                            added += 1
-                        }
-                    }
-                    if added == 0 && errors.first != nil {
-                        notice = errors.first
-                    } else if added == 0 {
-                        notice = "No .ipa file selected."
-                    } else {
-                        notice = nil
-                    }
-                } onCancel: {
-                    showImporter = false
-                }
-            }
+            .navigationBarItems(trailing: Button("Add", systemImage: "plus") { pickIPA() })
             .sheet(item: $signTarget) { app in
                 SigningView(app: app)
             }

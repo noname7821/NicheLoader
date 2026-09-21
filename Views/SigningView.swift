@@ -16,7 +16,6 @@ struct SigningView: View {
     @State private var customVersion = ""
     @State private var entitlementsName: String?
     @State private var entitlementsURL: URL?
-    @State private var showEntitlementsPicker = false
     @State private var message: String?
     @State private var isSigning = false
 
@@ -75,7 +74,16 @@ struct SigningView: View {
                     TextField("Custom version (optional)", text: $customVersion)
                         .textInputAutocapitalization(.never)
                     Button(entitlementsName.map { "Entitlements: \($0)" } ?? "Custom entitlements (optional)") {
-                        showEntitlementsPicker = true
+                        PickerPresenter.present(types: [.data], allowsMultiple: false) { urls in
+                            if let url = urls.first {
+                                guard url.pathExtension.lowercased() == "plist" else {
+                                    message = "That is not a .plist file."
+                                    return
+                                }
+                                entitlementsURL = url
+                                entitlementsName = url.lastPathComponent
+                            }
+                        }
                     }
                     if entitlementsName != nil {
                         Button("Clear entitlements", role: .destructive) {
@@ -99,21 +107,6 @@ struct SigningView: View {
                 }
             }
             .navigationTitle("Sign app")
-            .sheet(isPresented: $showEntitlementsPicker) {
-                DocumentPicker(types: [.data], allowsMultiple: false) { urls in
-                    showEntitlementsPicker = false
-                    if let url = urls.first {
-                        guard url.pathExtension.lowercased() == "plist" else {
-                            message = "That is not a .plist file."
-                            return
-                        }
-                        entitlementsURL = url
-                        entitlementsName = url.lastPathComponent
-                    }
-                } onCancel: {
-                    showEntitlementsPicker = false
-                }
-            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Close") { dismiss() }
