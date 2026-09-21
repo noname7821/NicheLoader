@@ -1,0 +1,338 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A100000000000000000000001 /* NicheLoaderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000000000000001 /* NicheLoaderApp.swift */; };
+		A100000000000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000000000000002 /* ContentView.swift */; };
+		A100000000000000000000003 /* FilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000000000000003 /* FilesView.swift */; };
+		A100000000000000000000004 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000000000000004 /* LibraryView.swift */; };
+		A100000000000000000000005 /* SourcesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000000000000005 /* SourcesView.swift */; };
+		A100000000000000000000006 /* SigningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000000000000006 /* SigningView.swift */; };
+		A100000000000000000000007 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000000000000007 /* SettingsView.swift */; };
+		A100000000000000000000008 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000000000000008 /* AboutView.swift */; };
+		A100000000000000000000009 /* CertificatePair.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000000000000009 /* CertificatePair.swift */; };
+		A10000000000000000000000A /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000000A /* KeychainHelper.swift */; };
+		A10000000000000000000000B /* CertificateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000000B /* CertificateStore.swift */; };
+		A10000000000000000000000C /* LibraryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000000C /* LibraryStore.swift */; };
+		A10000000000000000000000D /* Signer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000000D /* Signer.swift */; };
+		A10000000000000000000000E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000000E /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A200000000000000000000001 /* NicheLoaderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NicheLoaderApp.swift; sourceTree = "<group>"; };
+		A200000000000000000000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		A200000000000000000000003 /* FilesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesView.swift; sourceTree = "<group>"; };
+		A200000000000000000000004 /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
+		A200000000000000000000005 /* SourcesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourcesView.swift; sourceTree = "<group>"; };
+		A200000000000000000000006 /* SigningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SigningView.swift; sourceTree = "<group>"; };
+		A200000000000000000000007 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A200000000000000000000008 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		A200000000000000000000009 /* CertificatePair.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CertificatePair.swift; sourceTree = "<group>"; };
+		A20000000000000000000000A /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
+		A20000000000000000000000B /* CertificateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CertificateStore.swift; sourceTree = "<group>"; };
+		A20000000000000000000000C /* LibraryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryStore.swift; sourceTree = "<group>"; };
+		A20000000000000000000000D /* Signer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Signer.swift; sourceTree = "<group>"; };
+		A20000000000000000000000E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A300000000000000000000001 /* NicheLoader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NicheLoader.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A400000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A500000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				A500000000000000000000002 /* App */,
+				A500000000000000000000003 /* Models */,
+				A500000000000000000000004 /* Services */,
+				A500000000000000000000005 /* Views */,
+				A500000000000000000000006 /* Resources */,
+				A500000000000000000000007 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A500000000000000000000002 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A200000000000000000000001 /* NicheLoaderApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		A500000000000000000000003 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A200000000000000000000009 /* CertificatePair.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A500000000000000000000004 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000000A /* KeychainHelper.swift */,
+				A20000000000000000000000B /* CertificateStore.swift */,
+				A20000000000000000000000C /* LibraryStore.swift */,
+				A20000000000000000000000D /* Signer.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		A500000000000000000000005 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A200000000000000000000002 /* ContentView.swift */,
+				A200000000000000000000003 /* FilesView.swift */,
+				A200000000000000000000004 /* LibraryView.swift */,
+				A200000000000000000000005 /* SourcesView.swift */,
+				A200000000000000000000006 /* SigningView.swift */,
+				A200000000000000000000007 /* SettingsView.swift */,
+				A200000000000000000000008 /* AboutView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A500000000000000000000006 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000000E /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		A500000000000000000000007 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A300000000000000000000001 /* NicheLoader.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A600000000000000000000001 /* NicheLoader */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A800000000000000000000003 /* Build configuration list for PBXNativeTarget "NicheLoader" */;
+			buildPhases = (
+				A400000000000000000000001 /* Frameworks */,
+				A700000000000000000000001 /* Sources */,
+				A700000000000000000000002 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = NicheLoader;
+			productName = "$(TARGET_NAME)";
+			productReference = A300000000000000000000001 /* NicheLoader.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A900000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1640;
+				TargetAttributes = {
+					A600000000000000000000001 = {
+						CreatedOnToolsVersion = 16.4;
+					};
+				};
+			};
+			buildConfigurationList = A800000000000000000000001 /* Build configuration list for PBXProject "NicheLoader" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = A500000000000000000000001;
+			productRefGroup = A500000000000000000000007 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A600000000000000000000001 /* NicheLoader */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A700000000000000000000002 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000000E /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A700000000000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A100000000000000000000001 /* NicheLoaderApp.swift in Sources */,
+				A100000000000000000000002 /* ContentView.swift in Sources */,
+				A100000000000000000000003 /* FilesView.swift in Sources */,
+				A100000000000000000000004 /* LibraryView.swift in Sources */,
+				A100000000000000000000005 /* SourcesView.swift in Sources */,
+				A100000000000000000000006 /* SigningView.swift in Sources */,
+				A100000000000000000000007 /* SettingsView.swift in Sources */,
+				A100000000000000000000008 /* AboutView.swift in Sources */,
+				A100000000000000000000009 /* CertificatePair.swift in Sources */,
+				A10000000000000000000000A /* KeychainHelper.swift in Sources */,
+				A10000000000000000000000B /* CertificateStore.swift in Sources */,
+				A10000000000000000000000C /* LibraryStore.swift in Sources */,
+				A10000000000000000000000D /* Signer.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		B100000000000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		B100000000000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		B200000000000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = NicheLoader;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.filmeacc.nicheloader;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B200000000000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = NicheLoader;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.filmeacc.nicheloader;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A800000000000000000000001 /* Build configuration list for PBXProject "NicheLoader" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B100000000000000000000001 /* Debug */,
+				B100000000000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A800000000000000000000003 /* Build configuration list for PBXNativeTarget "NicheLoader" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B200000000000000000000001 /* Debug */,
+				B200000000000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A900000000000000000000001 /* Project object */;
+}

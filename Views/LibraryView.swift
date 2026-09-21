@@ -1,0 +1,60 @@
+import SwiftUI
+import UniformTypeIdentifiers
+
+struct LibraryView: View {
+    @EnvironmentObject private var library: LibraryStore
+    @State private var showImporter = false
+    @State private var signTarget: LibraryApp?
+
+    var body: some View {
+        NavigationStack {
+            Group {
+                if library.apps.isEmpty {
+                    ContentUnavailableView(
+                        "No apps yet",
+                        systemImage: "square.grid.2x2",
+                        description: Text("Import an .ipa file to get started.")
+                    )
+                } else {
+                    List {
+                        ForEach(library.apps) { app in
+                            HStack {
+                                Image(systemName: "app.fill")
+                                    .font(.title2)
+                                    .foregroundStyle(.purple)
+                                VStack(alignment: .leading) {
+                                    Text(app.name).font(.headline).lineLimit(1)
+                                    Text(LibraryStore.formattedSize(app.size))
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                Button("Sign") { signTarget = app }
+                                    .buttonStyle(.borderedProminent)
+                                    .tint(.purple)
+                            }
+                            .swipeActions {
+                                Button(role: .destructive) { library.remove(app) } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Library")
+            .toolbar {
+                Button("Add", systemImage: "plus") { showImporter = true }
+            }
+            .fileImporter(isPresented: $showImporter, allowedContentTypes: [UTType(filenameExtension: "ipa") ?? .data]) { result in
+                if case .success(let urls) = result, let first = urls.first {
+                    library.importIPA(from: first)
+                }
+            }
+            .sheet(item: $signTarget) { app in
+                SigningView(app: app)
+            }
+            .onAppear { library.refresh() }
+        }
+    }
+}
