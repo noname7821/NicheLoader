@@ -6,7 +6,7 @@ struct SigningView: View {
     @EnvironmentObject private var library: LibraryStore
     @Environment(\.dismiss) private var dismiss
 
-    var app: LibraryApp
+    var app: StoredApp
     var engine: SigningEngine = ZsignEngine()
 
     @State private var certificateID: String?
@@ -24,9 +24,9 @@ struct SigningView: View {
         NavigationStack {
             Form {
                 Section("App") {
-                    Text(app.displayName)
-                    if !app.bundleID.isEmpty {
-                        Text(app.bundleID)
+                    Text(app.name)
+                    if !app.identifier.isEmpty {
+                        Text(app.identifier)
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
@@ -138,19 +138,19 @@ struct SigningView: View {
                     isSigning = false
                 }
             }
-            let appDir: URL
+            let prepared: (appDir: URL, root: URL)
             do {
-                appDir = try library.prepareForSigning(app)
+                prepared = try library.prepareForSigning(app)
             } catch {
                 fail(error.localizedDescription)
                 return
             }
             defer {
-                try? FileManager.default.removeItem(at: appDir.deletingLastPathComponent().deletingLastPathComponent())
+                try? FileManager.default.removeItem(at: prepared.root)
             }
             DispatchQueue.main.async { message = "Signing…" }
             let request = SigningRequest(
-                appURL: appDir,
+                appURL: prepared.appDir,
                 certificate: cert,
                 p12Path: store.p12URL(for: cert).path,
                 p12Password: store.password(for: cert),
@@ -170,10 +170,18 @@ struct SigningView: View {
                 return
             }
             DispatchQueue.main.async { message = "Repacking…" }
-            if let error = library.finishSignedApp(appDir: appDir, originalName: app.displayName) {
+            let payloadDir = prepared.appDir.deletingLastPathComponent()
+            if let error = library.finishSignedApp(
+                payloadDir: payloadDir,
+                original: app,
+                name: customName,
+                identifier: customIdentifier,
+                version: customVersion
+            ) {
                 fail(error)
                 return
             }
+            try? FileManager.default.removeItem(at: prepared.root)
             DispatchQueue.main.async {
                 message = "Signed. Find it under Signed."
                 isSigning = false

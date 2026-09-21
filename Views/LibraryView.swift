@@ -4,9 +4,11 @@ import UniformTypeIdentifiers
 struct LibraryView: View {
     @EnvironmentObject private var library: LibraryStore
     @State private var showImporter = false
-    @State private var signTarget: LibraryApp?
+    @State private var signTarget: StoredApp?
     @State private var notice: String?
     @State private var tab = 0
+    @State private var showExport = false
+    @State private var exportURL: URL?
 
     var body: some View {
         NavigationStack {
@@ -51,8 +53,14 @@ struct LibraryView: View {
                             ForEach(currentApps) { app in
                                 LibraryRowView(
                                     app: app,
-                                    showsSignButton: tab == 0,
-                                    onSign: { signTarget = app }
+                                    signed: tab == 1,
+                                    onSign: { signTarget = app },
+                                    onExport: {
+                                        if let url = library.exportURL(for: app) {
+                                            exportURL = url
+                                            showExport = true
+                                        }
+                                    }
                                 )
                             }
                         }
@@ -91,20 +99,26 @@ struct LibraryView: View {
             .sheet(item: $signTarget) { app in
                 SigningView(app: app)
             }
+            .sheet(isPresented: $showExport) {
+                if let exportURL {
+                    ActivitySheet(items: [exportURL])
+                }
+            }
             .onAppear { library.refresh() }
         }
     }
 
-    private var currentApps: [LibraryApp] {
+    private var currentApps: [StoredApp] {
         tab == 0 ? library.unsignedApps : library.signedApps
     }
 }
 
 private struct LibraryRowView: View {
     @EnvironmentObject private var library: LibraryStore
-    var app: LibraryApp
-    var showsSignButton: Bool
+    var app: StoredApp
+    var signed: Bool
     var onSign: () -> Void
+    var onExport: () -> Void
 
     var body: some View {
         HStack(spacing: 12) {
@@ -118,7 +132,7 @@ private struct LibraryRowView: View {
                         )
                     )
                     .frame(width: 54, height: 54)
-                if let thumb = library.thumbnail(for: app),
+                if let thumb = library.iconURL(for: app, signed: signed),
                    let image = UIImage(contentsOfFile: thumb.path) {
                     Image(uiImage: image)
                         .resizable()
@@ -131,49 +145,44 @@ private struct LibraryRowView: View {
                 }
             }
             VStack(alignment: .leading, spacing: 3) {
-                Text(app.displayName).font(.headline).lineLimit(1)
-                if !app.bundleID.isEmpty {
-                    Text(app.bundleID)
+                Text(app.name).font(.headline).lineLimit(1)
+                if !app.identifier.isEmpty {
+                    Text(app.identifier)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
-                HStack(spacing: 6) {
-                    if !app.version.isEmpty {
-                        Text("v\(app.version)")
-                            .font(.caption2)
-                            .bold()
-                            .padding(.horizontal, 7)
-                            .padding(.vertical, 2)
-                            .background(.purple.opacity(0.15))
-                            .foregroundStyle(.purple)
-                            .clipShape(Capsule())
-                    }
-                    Text(LibraryStore.formattedSize(app.size))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                if !app.version.isEmpty {
+                    Text("v\(app.version)")
+                        .font(.caption2)
+                        .bold()
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 2)
+                        .background(.purple.opacity(0.15))
+                        .foregroundStyle(.purple)
+                        .clipShape(Capsule())
                 }
             }
             Spacer()
-            if showsSignButton {
-                Button("Sign", action: onSign)
-                    .buttonStyle(.borderedProminent)
-                    .tint(.purple)
-            } else {
-                ShareLink(item: app.url) {
+            if signed {
+                Button(action: onExport) {
                     Image(systemName: "square.and.arrow.up")
                         .foregroundStyle(.purple)
                 }
+            } else {
+                Button("Sign", action: onSign)
+                    .buttonStyle(.borderedProminent)
+                    .tint(.purple)
             }
         }
         .padding(.vertical, 4)
         .swipeActions {
             Button(role: .destructive) {
                 withAnimation {
-                    if showsSignButton {
-                        library.removeUnsigned(app)
-                    } else {
+                    if signed {
                         library.removeSigned(app)
+                    } else {
+                        library.removeUnsigned(app)
                     }
                 }
             } label: {
