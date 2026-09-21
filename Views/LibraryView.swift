@@ -24,7 +24,7 @@ struct LibraryView: View {
                 }
             }
             .navigationTitle("Library")
-            .toolbar(content: addToolbar)
+            .toolbar { addToolbar }
             .fileImporter(isPresented: $showImporter, allowedContentTypes: [UTType(filenameExtension: "ipa") ?? .data]) { result in
                 if case .success(let url) = result {
                     library.importIPA(from: url)
