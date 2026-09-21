@@ -11,6 +11,7 @@ final class LocalInstallServer {
     var manifestData = Data()
     var ipaURL: URL?
     var iconData: Data?
+    var onManifestServed: (() -> Void)?
     var onPayloadServed: (() -> Void)?
 
     private(set) var port: Int = 0
@@ -64,6 +65,7 @@ final class LocalInstallServer {
     private func respond(path: String, on connection: NWConnection) {
         switch path {
         case "/manifest.plist":
+            DispatchQueue.main.async { [weak self] in self?.onManifestServed?() }
             send(data: manifestData, type: "text/xml", on: connection)
         case "/icon.png":
             send(data: iconData ?? Data(), type: "image/png", on: connection)

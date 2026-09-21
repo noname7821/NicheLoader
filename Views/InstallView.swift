@@ -111,25 +111,31 @@ struct InstallView: View {
                 installer.ipaURL = ipa
                 installer.iconData = icon
                 try installer.start()
-                // Loopback is exempt from App Transport Security, LAN IPs are not.
-                let base = "http://127.0.0.1:\(installer.port)"
+                // Loopback proves the server runs (exempt from ATS).
+                // iOS itself gets the LAN address, like Ksign's http mode.
+                let loopBase = "http://127.0.0.1:\(installer.port)"
+                let lanBase = DeviceIP.localAddress().map { "http://\($0):\(installer.port)" }
                 installer.manifestData = Data(manifest(
                     bundleID: app.identifier,
                     version: app.version.isEmpty ? "1.0" : app.version,
                     title: app.name,
-                    base: base
+                    base: lanBase ?? loopBase
                 ).utf8)
+                installer.onManifestServed = {
+                    phase = .installing
+                    detail = "iOS asked for the manifest, downloading…"
+                }
                 installer.onPayloadServed = {
                     phase = .finished
                     detail = "iOS is installing the app. Watch your Home Screen."
                 }
                 // Self-test: prove inside this screen that the server answers.
-                let testURL = URL(string: "\(base)/manifest.plist")!
+                let testURL = URL(string: "\(loopBase)/manifest.plist")!
                 let (testData, _) = try await URLSession.shared.data(from: testURL)
                 let ok = !testData.isEmpty
                 DispatchQueue.main.async {
                     self.server = installer
-                    self.baseURL = base
+                    self.baseURL = lanBase ?? loopBase
                     self.serverOK = ok
                     if ok {
                         self.phase = .ready
@@ -153,7 +159,8 @@ struct InstallView: View {
             detail = "Could not build the install link."
             return
         }
-        guard let url = URL(string: "itms-services://?action=download-manifest&url=http://127.0.0.1:\(server.port)/manifest.plist") else {
+        let host = DeviceIP.localAddress() ?? "127.0.0.1"
+        guard let url = URL(string: "itms-services://?action=download-manifest&url=http://\(host):\(server.port)/manifest.plist") else {
             detail = "Could not build the install link."
             return
         }
