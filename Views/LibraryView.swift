@@ -10,11 +10,17 @@ struct LibraryView: View {
         NavigationStack {
             Group {
                 if library.apps.isEmpty {
-                    ContentUnavailableView(
-                        "No apps yet",
-                        systemImage: "square.grid.2x2",
-                        description: Text("Import an .ipa file to get started.")
-                    )
+                    VStack(spacing: 12) {
+                        Image(systemName: "square.grid.2x2")
+                            .font(.system(size: 48))
+                            .foregroundStyle(.secondary)
+                        Text("No apps yet")
+                            .font(.headline)
+                        Text("Import an .ipa file to get started.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     List {
                         ForEach(library.apps) { app in
