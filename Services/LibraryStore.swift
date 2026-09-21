@@ -209,26 +209,9 @@ final class LibraryStore: ObservableObject {
         return nil
     }
 
-    static func formattedSize(of dir: URL) -> String {
-        let bytes = (try? FileManager.default.allocatedSize(of: dir)) ?? 0
+    static func formattedSize(_ bytes: Int64) -> String {
         if bytes >= 1_048_576 { return String(format: "%.1f MB", Double(bytes) / 1_048_576) }
         if bytes >= 1024 { return "\(bytes / 1024) KB" }
         return "\(bytes) B"
-    }
-}
-
-private extension FileManager {
-    func allocatedSize(of url: URL) -> Int64 {
-        var total: Int64 = 0
-        if let values = try? url.resourceValues(forKeys: [.isDirectoryKey, .fileSizeKey]) {
-            if values.isDirectory == true {
-                for child in (try? contentsOfDirectory(at: url, includingPropertiesForKeys: [.isDirectoryKey, .fileSizeKey], options: []) ?? []) {
-                    total += allocatedSize(of: child)
-                }
-            } else {
-                total += Int64(values.fileSize ?? 0)
-            }
-        }
-        return total
     }
 }
