@@ -8,6 +8,7 @@ struct LibraryView: View {
     @State private var tab = 0
     @State private var showExport = false
     @State private var exportURL: URL?
+    @State private var installTarget: StoredApp?
 
     private func pickIPA() {
         PickerPresenter.present(types: [.data], allowsMultiple: true) { urls in
@@ -75,6 +76,7 @@ struct LibraryView: View {
                                     app: app,
                                     signed: tab == 1,
                                     onSign: { signTarget = app },
+                                    onInstall: { installTarget = app },
                                     onExport: {
                                         if let url = library.exportURL(for: app) {
                                             exportURL = url
@@ -96,6 +98,9 @@ struct LibraryView: View {
             .sheet(item: $signTarget) { app in
                 SigningView(app: app)
             }
+            .sheet(item: $installTarget) { app in
+                InstallView(app: app)
+            }
             .sheet(isPresented: $showExport) {
                 if let exportURL {
                     ActivitySheet(items: [exportURL])
@@ -115,6 +120,7 @@ private struct LibraryRowView: View {
     var app: StoredApp
     var signed: Bool
     var onSign: () -> Void
+    var onInstall: () -> Void
     var onExport: () -> Void
 
     var body: some View {
@@ -162,10 +168,9 @@ private struct LibraryRowView: View {
             }
             Spacer()
             if signed {
-                Button(action: onExport) {
-                    Image(systemName: "square.and.arrow.up")
-                        .foregroundStyle(.purple)
-                }
+                Button("Install", action: onInstall)
+                    .buttonStyle(.borderedProminent)
+                    .tint(.purple)
             } else {
                 Button("Sign", action: onSign)
                     .buttonStyle(.borderedProminent)
@@ -174,6 +179,12 @@ private struct LibraryRowView: View {
         }
         .padding(.vertical, 4)
         .swipeActions {
+            if signed {
+                Button(action: onExport) {
+                    Label("Export", systemImage: "square.and.arrow.up")
+                }
+                .tint(.purple)
+            }
             Button(role: .destructive) {
                 withAnimation {
                     if signed {

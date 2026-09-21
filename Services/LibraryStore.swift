@@ -147,20 +147,23 @@ final class LibraryStore: ObservableObject {
         persist()
     }
 
-    /// Zips a signed app to a temp .ipa for sharing. Returns nil on failure.
-    func exportURL(for app: StoredApp) -> URL? {
+    /// Zips a signed app to a temp .ipa for installing or sharing.
+    func packageSignedApp(_ app: StoredApp) throws -> URL {
         let payload = signedFolder.appendingPathComponent(app.uuid, isDirectory: true)
             .appendingPathComponent("Payload", isDirectory: true)
-        guard FileManager.default.fileExists(atPath: payload.path) else { return nil }
+        guard FileManager.default.fileExists(atPath: payload.path) else {
+            throw SigningError.failed("Signed files are gone. Sign the app again.")
+        }
         let dest = FileManager.default.temporaryDirectory
             .appendingPathComponent("\(app.name)-signed.ipa")
         try? FileManager.default.removeItem(at: dest)
-        do {
-            try Zip.zipFiles(paths: [payload], zipFilePath: dest, password: nil, progress: nil)
-            return dest
-        } catch {
-            return nil
-        }
+        try Zip.zipFiles(paths: [payload], zipFilePath: dest, password: nil, progress: nil)
+        return dest
+    }
+
+    /// Zips a signed app to a temp .ipa for sharing. Returns nil on failure.
+    func exportURL(for app: StoredApp) -> URL? {
+        try? packageSignedApp(app)
     }
 
     /// Copies an unsigned app to a temp folder and returns its .app directory

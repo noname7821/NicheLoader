@@ -23,6 +23,7 @@ struct SettingsView: View {
                 .listRowBackground(EmptyView())
                 CertificateListView()
                 CertificateAddView()
+                ServerSectionView()
                 Section {
                     NavigationLink(destination: AboutView()) {
                         Label("About", systemImage: "info.circle")
