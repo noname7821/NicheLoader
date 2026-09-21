@@ -6,6 +6,7 @@ struct FilesView: View {
     @State private var showImporter = false
     @State private var showNewFolder = false
     @State private var newFolderName = ""
+    @State private var notice: String?
 
     var body: some View {
         NavigationStack {
@@ -53,6 +54,17 @@ struct FilesView: View {
             }
             .animation(.default, value: entries)
             .navigationTitle(title)
+            .overlay(alignment: .bottom) {
+                if let notice {
+                    Text(notice)
+                        .font(.footnote)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 8)
+                        .background(.ultraThinMaterial)
+                        .clipShape(Capsule())
+                        .padding(.bottom, 12)
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     if !isDocumentRoot {
@@ -83,11 +95,19 @@ struct FilesView: View {
             }
             .fileImporter(isPresented: $showImporter, allowedContentTypes: [.item], allowsMultipleSelection: true) { result in
                 if case .success(let urls) = result {
+                    var added = 0
+                    var lastError: String?
                     for url in urls {
                         let access = url.startAccessingSecurityScopedResource()
-                        try? FileManager.default.copyItem(at: url, to: current.appendingPathComponent(url.lastPathComponent))
+                        do {
+                            try FileManager.default.copyItem(at: url, to: current.appendingPathComponent(url.lastPathComponent))
+                            added += 1
+                        } catch {
+                            lastError = error.localizedDescription
+                        }
                         if access { url.stopAccessingSecurityScopedResource() }
                     }
+                    notice = added == 0 ? (lastError.map { "Copy failed: \($0)" } ?? "Nothing selected.") : nil
                     withAnimation { reload() }
                 }
             }

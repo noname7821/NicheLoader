@@ -118,6 +118,7 @@ struct SourcesView: View {
     @State private var newURL = ""
     @State private var newName = ""
     @State private var downloading: String?
+    @State private var downloadNotice: String?
 
     var body: some View {
         NavigationStack {
@@ -178,6 +179,17 @@ struct SourcesView: View {
             .overlay {
                 if model.isLoading { ProgressView().scaleEffect(1.4) }
             }
+            .overlay(alignment: .bottom) {
+                if let downloadNotice {
+                    Text(downloadNotice)
+                        .font(.footnote)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 8)
+                        .background(.ultraThinMaterial)
+                        .clipShape(Capsule())
+                        .padding(.bottom, 12)
+                }
+            }
             .onAppear {
                 if model.sources.contains(where: { $0.apps.isEmpty && !$0.failed }) {
                     model.fetchAll()
@@ -189,15 +201,33 @@ struct SourcesView: View {
     private func download(_ app: RepoApp) {
         guard let link = app.downloadURL else { return }
         downloading = app.id
-        URLSession.shared.downloadTask(with: link) { temp, _, _ in
-            defer { DispatchQueue.main.async { downloading = nil } }
-            guard let temp else { return }
-            let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            let dest = docs.appendingPathComponent("Apps", isDirectory: true)
-                .appendingPathComponent("\(app.name).ipa")
-            try? FileManager.default.createDirectory(at: dest.deletingLastPathComponent(), withIntermediateDirectories: true)
-            try? FileManager.default.removeItem(at: dest)
-            try? FileManager.default.moveItem(at: temp, to: dest)
+        downloadNotice = nil
+        URLSession.shared.downloadTask(with: link) { temp, _, error in
+            DispatchQueue.main.async { downloading = nil }
+            let message: String
+            if let error {
+                message = "Download failed: \(error.localizedDescription)"
+            } else if let temp {
+                let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+                let dest = docs.appendingPathComponent("Apps", isDirectory: true)
+                    .appendingPathComponent("\(app.name).ipa")
+                do {
+                    try FileManager.default.createDirectory(at: dest.deletingLastPathComponent(), withIntermediateDirectories: true)
+                    try? FileManager.default.removeItem(at: dest)
+                    try FileManager.default.moveItem(at: temp, to: dest)
+                    message = "Saved to Library."
+                } catch {
+                    message = "Save failed: \(error.localizedDescription)"
+                }
+            } else {
+                message = "Download failed: empty response."
+            }
+            DispatchQueue.main.async {
+                downloadNotice = message
+                DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                    if downloadNotice == message { downloadNotice = nil }
+                }
+            }
         }.resume()
     }
 }

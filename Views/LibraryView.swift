@@ -45,11 +45,22 @@ struct LibraryView: View {
             .navigationBarItems(trailing: Button("Add", systemImage: "plus") { showImporter = true })
             .fileImporter(isPresented: $showImporter, allowedContentTypes: [.data], allowsMultipleSelection: true) { result in
                 if case .success(let urls) = result {
+                    var errors: [String] = []
                     var added = 0
-                    for url in urls where url.pathExtension.lowercased() == "ipa" {
-                        if library.importIPA(from: url) { added += 1 }
+                    for url in urls {
+                        if let error = library.importIPA(from: url) {
+                            errors.append(error)
+                        } else {
+                            added += 1
+                        }
                     }
-                    notice = added == 0 ? "No .ipa file selected." : nil
+                    if added == 0 && errors.first != nil {
+                        notice = errors.first
+                    } else if added == 0 {
+                        notice = "No .ipa file selected."
+                    } else {
+                        notice = nil
+                    }
                 }
             }
             .sheet(item: $signTarget) { app in

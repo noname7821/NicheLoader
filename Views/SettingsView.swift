@@ -140,15 +140,15 @@ private struct CertificateAddView: View {
             notice = "Cannot save: the provisioning profile is invalid or expired."
             return
         }
-        if store.add(name: certName, p12: p12, provision: provision, password: certPassword) {
+        if let error = store.add(name: certName, p12: p12, provision: provision, password: certPassword) {
+            notice = error
+        } else {
             notice = "Certificate saved."
             certName = ""
             certPassword = ""
             pendingP12 = nil
             pendingProvision = nil
             pendingInfo = nil
-        } else {
-            notice = "Could not save. Check the files and try again."
         }
     }
 }

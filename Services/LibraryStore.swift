@@ -29,10 +29,14 @@ final class LibraryStore: ObservableObject {
         }.sorted { $0.name.lowercased() < $1.name.lowercased() }
     }
 
+    /// Returns nil on success, otherwise a message for the user.
     @discardableResult
-    func importIPA(from source: URL) -> Bool {
+    func importIPA(from source: URL) -> String? {
         let access = source.startAccessingSecurityScopedResource()
         defer { if access { source.stopAccessingSecurityScopedResource() } }
+        guard source.pathExtension.lowercased() == "ipa" else {
+            return "That file is not an .ipa."
+        }
         let dest = folder.appendingPathComponent(source.lastPathComponent)
         do {
             if FileManager.default.fileExists(atPath: dest.path) {
@@ -40,9 +44,9 @@ final class LibraryStore: ObservableObject {
             }
             try FileManager.default.copyItem(at: source, to: dest)
             refresh()
-            return true
+            return nil
         } catch {
-            return false
+            return "Import failed: \(error.localizedDescription)"
         }
     }
 

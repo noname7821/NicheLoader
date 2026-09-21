@@ -45,8 +45,9 @@ final class CertificateStore: ObservableObject {
         ProvisionInfo.parse(url: provisionURL(for: cert))
     }
 
+    /// Returns nil on success, otherwise a message for the user.
     @discardableResult
-    func add(name: String, p12: URL, provision: URL, password: String) -> Bool {
+    func add(name: String, p12: URL, provision: URL, password: String) -> String? {
         let cleanName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !cleanName.isEmpty else { return false }
         let id = UUID().uuidString
@@ -62,16 +63,16 @@ final class CertificateStore: ObservableObject {
             try FileManager.default.copyItem(at: p12, to: folder.appendingPathComponent(p12Name))
             try FileManager.default.copyItem(at: provision, to: folder.appendingPathComponent(provName))
         } catch {
-            return false
+            return "Copy failed: \(error.localizedDescription)"
         }
         guard KeychainHelper.save(password, account: id) else {
             try? FileManager.default.removeItem(at: folder.appendingPathComponent(p12Name))
             try? FileManager.default.removeItem(at: folder.appendingPathComponent(provName))
-            return false
+            return "Could not save the password in Keychain."
         }
         certificates.append(CertificatePair(id: id, name: cleanName, p12FileName: p12Name, provisionFileName: provName))
         persist()
-        return true
+        return nil
     }
 
     func remove(_ cert: CertificatePair) {
