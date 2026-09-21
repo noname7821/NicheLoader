@@ -37,10 +37,19 @@ struct InstallView: View {
             .navigationTitle("Install")
             .navigationBarItems(leading: Button("Close") {
                 server?.stop()
+                BackgroundAudioService.shared.stop()
                 dismiss()
             })
             .onAppear(perform: start)
-            .onDisappear { server?.stop() }
+            .onDisappear {
+                server?.stop()
+                BackgroundAudioService.shared.stop()
+            }
+            .onAppear(perform: start)
+            .onDisappear {
+                server?.stop()
+                BackgroundAudioService.shared.stop()
+            }
         }
     }
 
@@ -119,6 +128,7 @@ struct InstallView: View {
         }
         phase = .installing
         detail = "Waiting for iOS… confirm on your Home Screen."
+        BackgroundAudioService.shared.start()
         UIApplication.shared.open(url)
     }
 

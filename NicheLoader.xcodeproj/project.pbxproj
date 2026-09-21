@@ -30,6 +30,7 @@
 		A100000000000000000000018 /* Unzipper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000000000000018 /* Unzipper.swift */; };
 		A10000000000000000000001A /* InstallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001A /* InstallView.swift */; };
 		A10000000000000000000001B /* LocalInstallServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001B /* LocalInstallServer.swift */; };
+		A10000000000000000000001C /* BackgroundAudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001C /* BackgroundAudioService.swift */; };
 		A100000000000000000000012 /* ZsignSwift in Frameworks */ = {isa = PBXBuildFile; productRef = C410000000000000000000001 /* ZsignSwift */; };
 		A100000000000000000000016 /* Zip in Frameworks */ = {isa = PBXBuildFile; productRef = C430000000000000000000001 /* Zip */; };
 		A100000000000000000000019 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = C450000000000000000000001 /* ZIPFoundation */; };
@@ -60,6 +61,7 @@
 		A200000000000000000000018 /* Unzipper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Unzipper.swift; sourceTree = "<group>"; };
 		A20000000000000000000001A /* InstallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallView.swift; sourceTree = "<group>"; };
 		A20000000000000000000001B /* LocalInstallServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalInstallServer.swift; sourceTree = "<group>"; };
+		A20000000000000000000001C /* BackgroundAudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundAudioService.swift; sourceTree = "<group>"; };
 		A20000000000000000000000E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A300000000000000000000001 /* NicheLoader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NicheLoader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -121,6 +123,7 @@
 				A200000000000000000000015 /* IPAInspector.swift */,
 				A200000000000000000000018 /* Unzipper.swift */,
 				A20000000000000000000001B /* LocalInstallServer.swift */,
+				A20000000000000000000001C /* BackgroundAudioService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -302,6 +305,7 @@
 				A100000000000000000000018 /* Unzipper.swift in Sources */,
 				A10000000000000000000001A /* InstallView.swift in Sources */,
 				A10000000000000000000001B /* LocalInstallServer.swift in Sources */,
+				A10000000000000000000001C /* BackgroundAudioService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -374,6 +378,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = NicheLoader;
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_UIBackgroundModes = audio;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -398,6 +403,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = NicheLoader;
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_UIBackgroundModes = audio;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
