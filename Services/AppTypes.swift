@@ -12,4 +12,8 @@ extension UTType {
     static var nicheIPA: UTType {
         UTType(filenameExtension: "ipa", conformingTo: .data) ?? .data
     }
+
+    static var nichePlist: UTType {
+        UTType(filenameExtension: "plist", conformingTo: .data) ?? .data
+    }
 }

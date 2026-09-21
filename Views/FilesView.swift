@@ -40,6 +40,11 @@ struct FilesView: View {
                             } label: {
                                 Label(entry.name, systemImage: "folder.fill")
                             }
+                            .swipeActions {
+                                Button(role: .destructive) { delete(entry) } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            }
                         } else {
                             Label(entry.name, systemImage: "doc.fill")
                                 .swipeActions {

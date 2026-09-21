@@ -5,6 +5,7 @@ struct SigningOptions {
     var customName = ""
     var customIdentifier = ""
     var customVersion = ""
+    var entitlementsPath = ""
 }
 
 struct SigningRequest {

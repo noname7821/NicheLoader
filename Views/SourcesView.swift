@@ -5,6 +5,7 @@ struct RepoApp: Identifiable, Hashable {
     var name: String
     var version: String
     var downloadURL: URL?
+    var iconURL: URL?
 }
 
 struct RepoSource: Identifiable, Hashable {
@@ -25,6 +26,7 @@ struct AltStoreApp: Decodable {
     var bundleIdentifier: String?
     var version: String?
     var downloadURL: URL?
+    var iconURL: URL?
     var versions: [AltStoreVersion]?
 }
 
@@ -80,7 +82,8 @@ final class SourcesModel: ObservableObject {
                         id: entry.bundleIdentifier ?? entry.name ?? UUID().uuidString,
                         name: entry.name ?? "Unknown",
                         version: entry.version ?? entry.versions?.first?.version ?? "",
-                        downloadURL: entry.downloadURL ?? entry.versions?.first?.downloadURL
+                        downloadURL: entry.downloadURL ?? entry.versions?.first?.downloadURL,
+                        iconURL: entry.iconURL
                     )
                 }
                 if let feedName = feed.name, !feedName.isEmpty {
@@ -145,7 +148,15 @@ struct SourcesView: View {
                             Text("No apps found.").foregroundStyle(.secondary)
                         }
                         ForEach(source.apps) { app in
-                            HStack {
+                            HStack(spacing: 10) {
+                                AsyncImage(url: app.iconURL) { image in
+                                    image.resizable()
+                                } placeholder: {
+                                    Image(systemName: "app.fill")
+                                        .foregroundStyle(.purple)
+                                }
+                                .frame(width: 44, height: 44)
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
                                 VStack(alignment: .leading) {
                                     Text(app.name).font(.headline)
                                     if !app.version.isEmpty {

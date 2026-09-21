@@ -23,6 +23,8 @@
 		A10000000000000000000000F /* ProvisionInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000000F /* ProvisionInfo.swift */; };
 		A100000000000000000000010 /* AppTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000000000000010 /* AppTypes.swift */; };
 		A100000000000000000000011 /* P12Validator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000000000000011 /* P12Validator.swift */; };
+		A100000000000000000000013 /* ZsignEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000000000000013 /* ZsignEngine.swift */; };
+		A100000000000000000000012 /* ZsignSwift in Frameworks */ = {isa = PBXBuildFile; productRef = C410000000000000000000001 /* ZsignSwift */; };
 		A10000000000000000000000E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000000E /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -43,6 +45,7 @@
 		A20000000000000000000000F /* ProvisionInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProvisionInfo.swift; sourceTree = "<group>"; };
 		A200000000000000000000010 /* AppTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTypes.swift; sourceTree = "<group>"; };
 		A200000000000000000000011 /* P12Validator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P12Validator.swift; sourceTree = "<group>"; };
+		A200000000000000000000013 /* ZsignEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZsignEngine.swift; sourceTree = "<group>"; };
 		A20000000000000000000000E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A300000000000000000000001 /* NicheLoader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NicheLoader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -52,6 +55,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A100000000000000000000012 /* ZsignSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,6 +100,7 @@
 				A20000000000000000000000F /* ProvisionInfo.swift */,
 				A200000000000000000000010 /* AppTypes.swift */,
 				A200000000000000000000011 /* P12Validator.swift */,
+				A200000000000000000000013 /* ZsignEngine.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -146,6 +151,9 @@
 			dependencies = (
 			);
 			name = NicheLoader;
+			packageProductDependencies = (
+				C410000000000000000000001 /* ZsignSwift */,
+			);
 			productName = "$(TARGET_NAME)";
 			productReference = A300000000000000000000001 /* NicheLoader.app */;
 			productType = "com.apple.product-type.application";
@@ -172,6 +180,9 @@
 				en,
 			);
 			mainGroup = A500000000000000000000001;
+			packageReferences = (
+				C400000000000000000000001 /* XCRemoteSwiftPackageReference "Zsign" */,
+			);
 			productRefGroup = A500000000000000000000007 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -191,6 +202,25 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C400000000000000000000001 /* XCRemoteSwiftPackageReference "Zsign" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/khcrysalis/Zsign-Package";
+			requirement = {
+				kind = revision;
+				revision = 6ffe703df73ef9069adacdbb19d571f11a69a801;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C410000000000000000000001 /* ZsignSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C400000000000000000000001 /* XCRemoteSwiftPackageReference "Zsign" */;
+			productName = ZsignSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin PBXSourcesBuildPhase section */
 		A700000000000000000000001 /* Sources */ = {
@@ -213,6 +243,7 @@
 				A10000000000000000000000F /* ProvisionInfo.swift in Sources */,
 				A100000000000000000000010 /* AppTypes.swift in Sources */,
 				A100000000000000000000011 /* P12Validator.swift in Sources */,
+				A100000000000000000000013 /* ZsignEngine.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

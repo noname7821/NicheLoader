@@ -1,17 +1,21 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct SigningView: View {
     @EnvironmentObject private var store: CertificateStore
     @Environment(\.dismiss) private var dismiss
 
     var app: LibraryApp
-    var engine: SigningEngine = UnavailableEngine()
+    var engine: SigningEngine = ZsignEngine()
 
     @State private var certificateID: String?
     @State private var removeProvisioning = true
     @State private var customName = ""
     @State private var customIdentifier = ""
     @State private var customVersion = ""
+    @State private var entitlementsName: String?
+    @State private var entitlementsURL: URL?
+    @State private var showEntitlementsPicker = false
     @State private var message: String?
     @State private var isSigning = false
 
@@ -41,12 +45,27 @@ struct SigningView: View {
                         .textInputAutocapitalization(.never)
                     TextField("Custom version (optional)", text: $customVersion)
                         .textInputAutocapitalization(.never)
+                    Button(entitlementsName.map { "Entitlements: \($0)" } ?? "Custom entitlements (optional)") {
+                        showEntitlementsPicker = true
+                    }
+                    if entitlementsName != nil {
+                        Button("Clear entitlements", role: .destructive) {
+                            entitlementsName = nil
+                            entitlementsURL = nil
+                        }
+                    }
                 }
                 if let message {
                     Section { Text(message).foregroundStyle(.secondary) }
                 }
             }
             .navigationTitle("Sign app")
+            .fileImporter(isPresented: $showEntitlementsPicker, allowedContentTypes: [.nichePlist]) { result in
+                if case .success(let url) = result {
+                    entitlementsURL = url
+                    entitlementsName = url.lastPathComponent
+                }
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Close") { dismiss() }
@@ -77,7 +96,8 @@ struct SigningView: View {
                 removeProvisioningFile: removeProvisioning,
                 customName: customName,
                 customIdentifier: customIdentifier,
-                customVersion: customVersion
+                customVersion: customVersion,
+                entitlementsPath: entitlementsURL?.path ?? ""
             )
         )
         DispatchQueue.global(qos: .userInitiated).async {
