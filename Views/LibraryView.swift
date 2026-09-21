@@ -25,7 +25,9 @@ struct LibraryView: View {
             }
             .navigationTitle("Library")
             .toolbar {
-                Button("Add", systemImage: "plus") { showImporter = true }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Add", systemImage: "plus") { showImporter = true }
+                }
             }
             .fileImporter(isPresented: $showImporter, allowedContentTypes: [UTType(filenameExtension: "ipa") ?? .data]) { result in
                 if case .success(let url) = result {
