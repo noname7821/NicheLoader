@@ -1,5 +1,4 @@
 import SwiftUI
-import Zip
 
 struct InstallView: View {
     @EnvironmentObject private var library: LibraryStore
@@ -36,14 +35,10 @@ struct InstallView: View {
             }
             .padding(.top, 40)
             .navigationTitle("Install")
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Close") {
-                        server?.stop()
-                        dismiss()
-                    }
-                }
-            }
+            .navigationBarItems(leading: Button("Close") {
+                server?.stop()
+                dismiss()
+            })
             .onAppear(perform: start)
             .onDisappear { server?.stop() }
         }
