@@ -19,6 +19,10 @@ struct LibraryView: View {
                         Text("Import an .ipa file to get started.")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
+                        Button("Import IPA") { showImporter = true }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.purple)
+                            .padding(.top, 4)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {

@@ -20,6 +20,7 @@
 		A10000000000000000000000B /* CertificateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000000B /* CertificateStore.swift */; };
 		A10000000000000000000000C /* LibraryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000000C /* LibraryStore.swift */; };
 		A10000000000000000000000D /* Signer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000000D /* Signer.swift */; };
+		A10000000000000000000000F /* ProvisionInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000000F /* ProvisionInfo.swift */; };
 		A10000000000000000000000E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000000E /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -37,6 +38,7 @@
 		A20000000000000000000000B /* CertificateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CertificateStore.swift; sourceTree = "<group>"; };
 		A20000000000000000000000C /* LibraryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryStore.swift; sourceTree = "<group>"; };
 		A20000000000000000000000D /* Signer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Signer.swift; sourceTree = "<group>"; };
+		A20000000000000000000000F /* ProvisionInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProvisionInfo.swift; sourceTree = "<group>"; };
 		A20000000000000000000000E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A300000000000000000000001 /* NicheLoader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NicheLoader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -87,6 +89,7 @@
 				A20000000000000000000000B /* CertificateStore.swift */,
 				A20000000000000000000000C /* LibraryStore.swift */,
 				A20000000000000000000000D /* Signer.swift */,
+				A20000000000000000000000F /* ProvisionInfo.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -201,6 +204,7 @@
 				A10000000000000000000000B /* CertificateStore.swift in Sources */,
 				A10000000000000000000000C /* LibraryStore.swift in Sources */,
 				A10000000000000000000000D /* Signer.swift in Sources */,
+				A10000000000000000000000F /* ProvisionInfo.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

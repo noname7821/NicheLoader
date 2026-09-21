@@ -4,6 +4,8 @@ struct FilesView: View {
     @State private var current: URL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     @State private var entries: [FileEntry] = []
     @State private var showImporter = false
+    @State private var showNewFolder = false
+    @State private var newFolderName = ""
 
     var body: some View {
         NavigationStack {
@@ -12,40 +14,58 @@ struct FilesView: View {
                     Section("Quick access") {
                         ForEach(quickAccess, id: \.name) { folder in
                             Button {
-                                current = folder.url
-                                reload()
+                                withAnimation {
+                                    current = folder.url
+                                    reload()
+                                }
                             } label: {
                                 Label(folder.name, systemImage: "folder.fill")
+                                    .foregroundStyle(.purple)
                             }
                         }
                     }
                 }
                 Section("Contents") {
+                    if entries.isEmpty {
+                        Text("Empty folder.").foregroundStyle(.secondary)
+                    }
                     ForEach(entries) { entry in
                         if entry.isDirectory {
                             Button {
-                                current = entry.url
-                                reload()
+                                withAnimation {
+                                    current = entry.url
+                                    reload()
+                                }
                             } label: {
                                 Label(entry.name, systemImage: "folder.fill")
                             }
                         } else {
                             Label(entry.name, systemImage: "doc.fill")
+                                .swipeActions {
+                                    Button(role: .destructive) { delete(entry) } label: {
+                                        Label("Delete", systemImage: "trash")
+                                    }
+                                }
                         }
                     }
+                    .transition(.slide)
                 }
             }
+            .animation(.default, value: entries)
             .navigationTitle(title)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     if !isDocumentRoot {
                         Button("Back", systemImage: "chevron.left") {
-                            current = current.deletingLastPathComponent()
-                            reload()
+                            withAnimation {
+                                current = current.deletingLastPathComponent()
+                                reload()
+                            }
                         }
                     }
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    Button("Folder", systemImage: "folder.badge.plus") { showNewFolder = true }
                     Button("Add", systemImage: "plus") { showImporter = true }
                 }
             }
@@ -56,8 +76,20 @@ struct FilesView: View {
                         try? FileManager.default.copyItem(at: url, to: current.appendingPathComponent(url.lastPathComponent))
                         if access { url.stopAccessingSecurityScopedResource() }
                     }
-                    reload()
+                    withAnimation { reload() }
                 }
+            }
+            .alert("New folder", isPresented: $showNewFolder) {
+                TextField("Name", text: $newFolderName)
+                Button("Create") {
+                    let trimmed = newFolderName.trimmingCharacters(in: .whitespacesAndNewlines)
+                    if !trimmed.isEmpty {
+                        try? FileManager.default.createDirectory(at: current.appendingPathComponent(trimmed), withIntermediateDirectories: true)
+                        newFolderName = ""
+                        withAnimation { reload() }
+                    }
+                }
+                Button("Cancel", role: .cancel) { newFolderName = "" }
             }
             .onAppear(perform: reload)
         }
@@ -86,6 +118,11 @@ struct FilesView: View {
             let isDir = (try? url.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory ?? false
             return FileEntry(url: url, isDirectory: isDir)
         }.sorted { $0.name.lowercased() < $1.name.lowercased() }
+    }
+
+    private func delete(_ entry: FileEntry) {
+        try? FileManager.default.removeItem(at: entry.url)
+        withAnimation { reload() }
     }
 }
 

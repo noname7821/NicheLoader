@@ -41,6 +41,10 @@ final class CertificateStore: ObservableObject {
         KeychainHelper.load(account: cert.id) ?? ""
     }
 
+    func profileInfo(for cert: CertificatePair) -> ProvisionInfo? {
+        ProvisionInfo.parse(url: provisionURL(for: cert))
+    }
+
     @discardableResult
     func add(name: String, p12: URL, provision: URL, password: String) -> Bool {
         let cleanName = name.trimmingCharacters(in: .whitespacesAndNewlines)
