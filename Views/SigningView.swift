@@ -100,9 +100,13 @@ struct SigningView: View {
             }
             .navigationTitle("Sign app")
             .sheet(isPresented: $showEntitlementsPicker) {
-                DocumentPicker(types: [.nichePlist], allowsMultiple: false) { urls in
+                DocumentPicker(types: [.data], allowsMultiple: false) { urls in
                     showEntitlementsPicker = false
                     if let url = urls.first {
+                        guard url.pathExtension.lowercased() == "plist" else {
+                            message = "That is not a .plist file."
+                            return
+                        }
                         entitlementsURL = url
                         entitlementsName = url.lastPathComponent
                     }

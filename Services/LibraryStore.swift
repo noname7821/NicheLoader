@@ -105,9 +105,9 @@ final class LibraryStore: ObservableObject {
         defer { try? FileManager.default.removeItem(at: work) }
         do {
             try FileManager.default.createDirectory(at: work, withIntermediateDirectories: true)
-            try Zip.unzipFile(source, destination: work, overwrite: true, password: nil)
+            try Unzipper.unzip(ipa: source, to: work)
         } catch {
-            return "Unpack failed: \(error.localizedDescription)"
+            return error.localizedDescription
         }
         let payload = work.appendingPathComponent("Payload", isDirectory: true)
         guard FileManager.default.fileExists(atPath: payload.path),

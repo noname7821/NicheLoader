@@ -27,8 +27,10 @@
 		A100000000000000000000014 /* DocumentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000000000000014 /* DocumentPicker.swift */; };
 		A100000000000000000000015 /* IPAInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000000000000015 /* IPAInspector.swift */; };
 		A100000000000000000000017 /* ActivitySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000000000000017 /* ActivitySheet.swift */; };
+		A100000000000000000000018 /* Unzipper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000000000000018 /* Unzipper.swift */; };
 		A100000000000000000000012 /* ZsignSwift in Frameworks */ = {isa = PBXBuildFile; productRef = C410000000000000000000001 /* ZsignSwift */; };
 		A100000000000000000000016 /* Zip in Frameworks */ = {isa = PBXBuildFile; productRef = C430000000000000000000001 /* Zip */; };
+		A100000000000000000000019 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = C450000000000000000000001 /* ZIPFoundation */; };
 		A10000000000000000000000E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000000E /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -53,6 +55,7 @@
 		A200000000000000000000014 /* DocumentPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPicker.swift; sourceTree = "<group>"; };
 		A200000000000000000000015 /* IPAInspector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPAInspector.swift; sourceTree = "<group>"; };
 		A200000000000000000000017 /* ActivitySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivitySheet.swift; sourceTree = "<group>"; };
+		A200000000000000000000018 /* Unzipper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Unzipper.swift; sourceTree = "<group>"; };
 		A20000000000000000000000E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A300000000000000000000001 /* NicheLoader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NicheLoader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -64,6 +67,7 @@
 			files = (
 				A100000000000000000000012 /* ZsignSwift in Frameworks */,
 				A100000000000000000000016 /* Zip in Frameworks */,
+				A100000000000000000000019 /* ZIPFoundation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -110,6 +114,7 @@
 				A200000000000000000000011 /* P12Validator.swift */,
 				A200000000000000000000013 /* ZsignEngine.swift */,
 				A200000000000000000000015 /* IPAInspector.swift */,
+				A200000000000000000000018 /* Unzipper.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -165,6 +170,7 @@
 			packageProductDependencies = (
 				C410000000000000000000001 /* ZsignSwift */,
 				C430000000000000000000001 /* Zip */,
+				C450000000000000000000001 /* ZIPFoundation */,
 			);
 			productName = "$(TARGET_NAME)";
 			productReference = A300000000000000000000001 /* NicheLoader.app */;
@@ -195,6 +201,7 @@
 			packageReferences = (
 				C400000000000000000000001 /* XCRemoteSwiftPackageReference "Zsign" */,
 				C420000000000000000000001 /* XCRemoteSwiftPackageReference "Zip" */,
+				C440000000000000000000001 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 			);
 			productRefGroup = A500000000000000000000007 /* Products */;
 			projectDirPath = "";
@@ -233,6 +240,14 @@
 				minimumVersion = 2.1.0;
 			};
 		};
+		C440000000000000000000001 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/weichsel/ZIPFoundation";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -245,6 +260,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C420000000000000000000001 /* XCRemoteSwiftPackageReference "Zip" */;
 			productName = Zip;
+		};
+		C450000000000000000000001 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C440000000000000000000001 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
 		};
 /* End XCSwiftPackageProductDependency section */
 
@@ -273,6 +293,7 @@
 				A100000000000000000000014 /* DocumentPicker.swift in Sources */,
 				A100000000000000000000015 /* IPAInspector.swift in Sources */,
 				A100000000000000000000017 /* ActivitySheet.swift in Sources */,
+				A100000000000000000000018 /* Unzipper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

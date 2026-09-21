@@ -74,7 +74,7 @@ struct LibraryView: View {
             .navigationTitle("Library")
             .navigationBarItems(trailing: Button("Add", systemImage: "plus") { showImporter = true })
             .sheet(isPresented: $showImporter) {
-                DocumentPicker(types: [.nicheIPA], allowsMultiple: true) { urls in
+                DocumentPicker(types: [.data], allowsMultiple: true) { urls in
                     showImporter = false
                     var errors: [String] = []
                     var added = 0

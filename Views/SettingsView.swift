@@ -122,7 +122,7 @@ private struct CertificateAddView: View {
             isPresented: Binding(get: { pickerTarget != nil }, set: { if !$0 { pickerTarget = nil } })
         ) {
             DocumentPicker(
-                types: [pickerTarget == .p12 ? .nicheP12 : .nicheProvision],
+                types: [.data],
                 allowsMultiple: false
             ) { urls in
                 handlePicked(urls)
