@@ -43,9 +43,11 @@ struct AboutView: View {
                 }
             }
 
-            Section("Our app") {
+            Section {
                 Text("NicheLoader signs and installs your own iOS apps on-device. Import a certificate once, then sign any IPA with your own name, identifier and version.")
                     .foregroundStyle(.secondary)
+            } header: {
+                Text("Our app")
             } footer: {
                 Text(Bundle.main.bundleIdentifier ?? "")
             }

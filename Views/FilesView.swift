@@ -10,7 +10,7 @@ struct FilesView: View {
             List {
                 if isDocumentRoot {
                     Section("Quick access") {
-                        ForEach(quickAccess, id: \.self) { folder in
+                        ForEach(quickAccess, id: \.name) { folder in
                             Button {
                                 current = folder.url
                                 reload()
@@ -52,8 +52,9 @@ struct FilesView: View {
             .fileImporter(isPresented: $showImporter, allowedContentTypes: [.item], allowsMultipleSelection: true) { result in
                 if case .success(let urls) = result {
                     for url in urls {
-                        if url.startAccessingSecurityScopedResource() { defer { url.stopAccessingSecurityScopedResource() } }
+                        let access = url.startAccessingSecurityScopedResource()
                         try? FileManager.default.copyItem(at: url, to: current.appendingPathComponent(url.lastPathComponent))
+                        if access { url.stopAccessingSecurityScopedResource() }
                     }
                     reload()
                 }

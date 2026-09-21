@@ -31,7 +31,8 @@ final class LibraryStore: ObservableObject {
 
     @discardableResult
     func importIPA(from source: URL) -> Bool {
-        if source.startAccessingSecurityScopedResource() { defer { source.stopAccessingSecurityScopedResource() } }
+        let access = source.startAccessingSecurityScopedResource()
+        defer { if access { source.stopAccessingSecurityScopedResource() } }
         let dest = folder.appendingPathComponent(source.lastPathComponent)
         do {
             if FileManager.default.fileExists(atPath: dest.path) {

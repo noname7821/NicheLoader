@@ -18,26 +18,7 @@ struct LibraryView: View {
                 } else {
                     List {
                         ForEach(library.apps) { app in
-                            HStack {
-                                Image(systemName: "app.fill")
-                                    .font(.title2)
-                                    .foregroundStyle(.purple)
-                                VStack(alignment: .leading) {
-                                    Text(app.name).font(.headline).lineLimit(1)
-                                    Text(LibraryStore.formattedSize(app.size))
-                                        .font(.subheadline)
-                                        .foregroundStyle(.secondary)
-                                }
-                                Spacer()
-                                Button("Sign") { signTarget = app }
-                                    .buttonStyle(.borderedProminent)
-                                    .tint(.purple)
-                            }
-                            .swipeActions {
-                                Button(role: .destructive) { library.remove(app) } label: {
-                                    Label("Delete", systemImage: "trash")
-                                }
-                            }
+                            LibraryRowView(app: app, onSign: { signTarget = app })
                         }
                     }
                 }
@@ -55,6 +36,35 @@ struct LibraryView: View {
                 SigningView(app: app)
             }
             .onAppear { library.refresh() }
+        }
+    }
+}
+
+private struct LibraryRowView: View {
+    @EnvironmentObject private var library: LibraryStore
+    var app: LibraryApp
+    var onSign: () -> Void
+
+    var body: some View {
+        HStack {
+            Image(systemName: "app.fill")
+                .font(.title2)
+                .foregroundStyle(.purple)
+            VStack(alignment: .leading) {
+                Text(app.name).font(.headline).lineLimit(1)
+                Text(LibraryStore.formattedSize(app.size))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+            Button("Sign", action: onSign)
+                .buttonStyle(.borderedProminent)
+                .tint(.purple)
+        }
+        .swipeActions {
+            Button(role: .destructive) { library.remove(app) } label: {
+                Label("Delete", systemImage: "trash")
+            }
         }
     }
 }

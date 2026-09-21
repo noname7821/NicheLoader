@@ -48,9 +48,13 @@ final class CertificateStore: ObservableObject {
         let id = UUID().uuidString
         let p12Name = id + ".p12"
         let provName = id + ".mobileprovision"
+        let p12Access = p12.startAccessingSecurityScopedResource()
+        let provAccess = provision.startAccessingSecurityScopedResource()
+        defer {
+            if p12Access { p12.stopAccessingSecurityScopedResource() }
+            if provAccess { provision.stopAccessingSecurityScopedResource() }
+        }
         do {
-            if p12.startAccessingSecurityScopedResource() { defer { p12.stopAccessingSecurityScopedResource() } }
-            if provision.startAccessingSecurityScopedResource() { defer { provision.stopAccessingSecurityScopedResource() } }
             try FileManager.default.copyItem(at: p12, to: folder.appendingPathComponent(p12Name))
             try FileManager.default.copyItem(at: provision, to: folder.appendingPathComponent(provName))
         } catch {
