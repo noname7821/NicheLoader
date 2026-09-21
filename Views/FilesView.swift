@@ -66,6 +66,18 @@ struct FilesView: View {
                 }
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button("Folder", systemImage: "folder.badge.plus") { showNewFolder = true }
+                        .alert("New folder", isPresented: $showNewFolder) {
+                            TextField("Name", text: $newFolderName)
+                            Button("Create") {
+                                let trimmed = newFolderName.trimmingCharacters(in: .whitespacesAndNewlines)
+                                if !trimmed.isEmpty {
+                                    try? FileManager.default.createDirectory(at: current.appendingPathComponent(trimmed), withIntermediateDirectories: true)
+                                    newFolderName = ""
+                                    withAnimation { reload() }
+                                }
+                            }
+                            Button("Cancel", role: .cancel) { newFolderName = "" }
+                        }
                     Button("Add", systemImage: "plus") { showImporter = true }
                 }
             }
@@ -78,18 +90,6 @@ struct FilesView: View {
                     }
                     withAnimation { reload() }
                 }
-            }
-            .alert("New folder", isPresented: $showNewFolder) {
-                TextField("Name", text: $newFolderName)
-                Button("Create") {
-                    let trimmed = newFolderName.trimmingCharacters(in: .whitespacesAndNewlines)
-                    if !trimmed.isEmpty {
-                        try? FileManager.default.createDirectory(at: current.appendingPathComponent(trimmed), withIntermediateDirectories: true)
-                        newFolderName = ""
-                        withAnimation { reload() }
-                    }
-                }
-                Button("Cancel", role: .cancel) { newFolderName = "" }
             }
             .onAppear(perform: reload)
         }

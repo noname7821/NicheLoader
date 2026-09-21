@@ -1,5 +1,4 @@
 import SwiftUI
-import UniformTypeIdentifiers
 
 struct SettingsView: View {
     var body: some View {
@@ -55,8 +54,7 @@ private struct CertificateListView: View {
 
 private struct CertificateAddView: View {
     @EnvironmentObject private var store: CertificateStore
-    @State private var showP12 = false
-    @State private var showProvision = false
+    @State private var pickerTarget: PickTarget?
     @State private var pendingP12: URL?
     @State private var pendingProvision: URL?
     @State private var pendingInfo: ProvisionInfo?
@@ -64,8 +62,15 @@ private struct CertificateAddView: View {
     @State private var certPassword = ""
     @State private var notice: String?
 
-    private var p12Type: UTType { UTType(filenameExtension: "p12") ?? .data }
-    private var provisionType: UTType { UTType(filenameExtension: "mobileprovision") ?? .data }
+    private enum PickTarget: Identifiable {
+        case p12, provision
+        var id: Int {
+            switch self {
+            case .p12: return 0
+            case .provision: return 1
+            }
+        }
+    }
 
     private var canSave: Bool {
         pendingP12 != nil && pendingProvision != nil &&
@@ -77,10 +82,10 @@ private struct CertificateAddView: View {
             TextField("Name", text: $certName)
             SecureField("P12 password", text: $certPassword)
             Button(pendingP12 == nil ? "Choose .p12 file" : "P12: \(pendingP12?.lastPathComponent ?? "")") {
-                showP12 = true
+                pickerTarget = .p12
             }
             Button(pendingProvision == nil ? "Choose .mobileprovision file" : "Profile: \(pendingProvision?.lastPathComponent ?? "")") {
-                showProvision = true
+                pickerTarget = .provision
             }
             if let info = pendingInfo {
                 VStack(alignment: .leading, spacing: 2) {
@@ -96,11 +101,27 @@ private struct CertificateAddView: View {
                 Text(notice).foregroundStyle(.secondary)
             }
         }
-        .fileImporter(isPresented: $showP12, allowedContentTypes: [p12Type]) { result in
-            if case .success(let url) = result { pendingP12 = url }
-        }
-        .fileImporter(isPresented: $showProvision, allowedContentTypes: [provisionType]) { result in
-            if case .success(let url) = result {
+        .fileImporter(
+            isPresented: Binding(get: { pickerTarget != nil }, set: { if !$0 { pickerTarget = nil } }),
+            allowedContentTypes: [.data],
+            allowsMultipleSelection: false
+        ) { result in
+            guard let target = pickerTarget else { return }
+            pickerTarget = nil
+            guard case .success(let url) = result else { return }
+            switch target {
+            case .p12:
+                guard url.pathExtension.lowercased() == "p12" else {
+                    notice = "That is not a .p12 file."
+                    return
+                }
+                pendingP12 = url
+                notice = nil
+            case .provision:
+                guard url.pathExtension.lowercased() == "mobileprovision" else {
+                    notice = "That is not a .mobileprovision file."
+                    return
+                }
                 pendingProvision = url
                 pendingInfo = ProvisionInfo.parse(url: url)
                 if pendingInfo == nil {

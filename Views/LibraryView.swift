@@ -5,10 +5,18 @@ struct LibraryView: View {
     @EnvironmentObject private var library: LibraryStore
     @State private var showImporter = false
     @State private var signTarget: LibraryApp?
+    @State private var notice: String?
 
     var body: some View {
         NavigationStack {
             Group {
+                if let notice {
+                    Text(notice)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 4)
+                }
                 if library.apps.isEmpty {
                     VStack(spacing: 12) {
                         Image(systemName: "square.grid.2x2")
@@ -35,9 +43,13 @@ struct LibraryView: View {
             }
             .navigationTitle("Library")
             .navigationBarItems(trailing: Button("Add", systemImage: "plus") { showImporter = true })
-            .fileImporter(isPresented: $showImporter, allowedContentTypes: [UTType(filenameExtension: "ipa") ?? .data]) { result in
-                if case .success(let url) = result {
-                    library.importIPA(from: url)
+            .fileImporter(isPresented: $showImporter, allowedContentTypes: [.data], allowsMultipleSelection: true) { result in
+                if case .success(let urls) = result {
+                    var added = 0
+                    for url in urls where url.pathExtension.lowercased() == "ipa" {
+                        if library.importIPA(from: url) { added += 1 }
+                    }
+                    notice = added == 0 ? "No .ipa file selected." : nil
                 }
             }
             .sheet(item: $signTarget) { app in
