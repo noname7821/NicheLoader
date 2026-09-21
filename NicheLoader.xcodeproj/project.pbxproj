@@ -24,7 +24,10 @@
 		A100000000000000000000010 /* AppTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000000000000010 /* AppTypes.swift */; };
 		A100000000000000000000011 /* P12Validator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000000000000011 /* P12Validator.swift */; };
 		A100000000000000000000013 /* ZsignEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000000000000013 /* ZsignEngine.swift */; };
+		A100000000000000000000014 /* DocumentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000000000000014 /* DocumentPicker.swift */; };
+		A100000000000000000000015 /* IPAInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A200000000000000000000015 /* IPAInspector.swift */; };
 		A100000000000000000000012 /* ZsignSwift in Frameworks */ = {isa = PBXBuildFile; productRef = C410000000000000000000001 /* ZsignSwift */; };
+		A100000000000000000000016 /* Zip in Frameworks */ = {isa = PBXBuildFile; productRef = C430000000000000000000001 /* Zip */; };
 		A10000000000000000000000E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000000E /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -46,6 +49,8 @@
 		A200000000000000000000010 /* AppTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTypes.swift; sourceTree = "<group>"; };
 		A200000000000000000000011 /* P12Validator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = P12Validator.swift; sourceTree = "<group>"; };
 		A200000000000000000000013 /* ZsignEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZsignEngine.swift; sourceTree = "<group>"; };
+		A200000000000000000000014 /* DocumentPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPicker.swift; sourceTree = "<group>"; };
+		A200000000000000000000015 /* IPAInspector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPAInspector.swift; sourceTree = "<group>"; };
 		A20000000000000000000000E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A300000000000000000000001 /* NicheLoader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NicheLoader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -56,6 +61,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A100000000000000000000012 /* ZsignSwift in Frameworks */,
+				A100000000000000000000016 /* Zip in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -101,6 +107,7 @@
 				A200000000000000000000010 /* AppTypes.swift */,
 				A200000000000000000000011 /* P12Validator.swift */,
 				A200000000000000000000013 /* ZsignEngine.swift */,
+				A200000000000000000000015 /* IPAInspector.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -115,6 +122,7 @@
 				A200000000000000000000006 /* SigningView.swift */,
 				A200000000000000000000007 /* SettingsView.swift */,
 				A200000000000000000000008 /* AboutView.swift */,
+				A200000000000000000000014 /* DocumentPicker.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -153,6 +161,7 @@
 			name = NicheLoader;
 			packageProductDependencies = (
 				C410000000000000000000001 /* ZsignSwift */,
+				C430000000000000000000001 /* Zip */,
 			);
 			productName = "$(TARGET_NAME)";
 			productReference = A300000000000000000000001 /* NicheLoader.app */;
@@ -182,6 +191,7 @@
 			mainGroup = A500000000000000000000001;
 			packageReferences = (
 				C400000000000000000000001 /* XCRemoteSwiftPackageReference "Zsign" */,
+				C420000000000000000000001 /* XCRemoteSwiftPackageReference "Zip" */,
 			);
 			productRefGroup = A500000000000000000000007 /* Products */;
 			projectDirPath = "";
@@ -212,6 +222,14 @@
 				revision = 6ffe703df73ef9069adacdbb19d571f11a69a801;
 			};
 		};
+		C420000000000000000000001 /* XCRemoteSwiftPackageReference "Zip" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/marmelroy/Zip";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -219,6 +237,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C400000000000000000000001 /* XCRemoteSwiftPackageReference "Zsign" */;
 			productName = ZsignSwift;
+		};
+		C430000000000000000000001 /* Zip */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C420000000000000000000001 /* XCRemoteSwiftPackageReference "Zip" */;
+			productName = Zip;
 		};
 /* End XCSwiftPackageProductDependency section */
 
@@ -244,6 +267,8 @@
 				A100000000000000000000010 /* AppTypes.swift in Sources */,
 				A100000000000000000000011 /* P12Validator.swift in Sources */,
 				A100000000000000000000013 /* ZsignEngine.swift in Sources */,
+				A100000000000000000000014 /* DocumentPicker.swift in Sources */,
+				A100000000000000000000015 /* IPAInspector.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

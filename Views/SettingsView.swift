@@ -101,35 +101,45 @@ private struct CertificateAddView: View {
                 Text(notice).foregroundStyle(.secondary)
             }
         }
-        .fileImporter(
-            isPresented: Binding(get: { pickerTarget != nil }, set: { if !$0 { pickerTarget = nil } }),
-            allowedContentTypes: [pickerTarget == .p12 ? .nicheP12 : .nicheProvision]
-        ) { result in
-            guard let target = pickerTarget else { return }
-            pickerTarget = nil
-            guard case .success(let url) = result else { return }
-            switch target {
-            case .p12:
-                guard url.pathExtension.lowercased() == "p12" else {
-                    notice = "That is not a .p12 file."
-                    return
-                }
-                pendingP12 = url
+        .sheet(
+            isPresented: Binding(get: { pickerTarget != nil }, set: { if !$0 { pickerTarget = nil } })
+        ) {
+            DocumentPicker(
+                types: [pickerTarget == .p12 ? .nicheP12 : .nicheProvision],
+                allowsMultiple: false
+            ) { urls in
+                handlePicked(urls)
+            } onCancel: {
+                pickerTarget = nil
+            }
+        }
+    }
+
+    private func handlePicked(_ urls: [URL]) {
+        guard let target = pickerTarget else { return }
+        pickerTarget = nil
+        guard let url = urls.first else { return }
+        switch target {
+        case .p12:
+            guard url.pathExtension.lowercased() == "p12" else {
+                notice = "That is not a .p12 file."
+                return
+            }
+            pendingP12 = url
+            notice = nil
+        case .provision:
+            guard url.pathExtension.lowercased() == "mobileprovision" else {
+                notice = "That is not a .mobileprovision file."
+                return
+            }
+            pendingProvision = url
+            pendingInfo = ProvisionInfo.parse(url: url)
+            if pendingInfo == nil {
+                notice = "This is not a valid provisioning profile."
+            } else if pendingInfo?.isExpired == true {
+                notice = "Warning: this profile is expired."
+            } else {
                 notice = nil
-            case .provision:
-                guard url.pathExtension.lowercased() == "mobileprovision" else {
-                    notice = "That is not a .mobileprovision file."
-                    return
-                }
-                pendingProvision = url
-                pendingInfo = ProvisionInfo.parse(url: url)
-                if pendingInfo == nil {
-                    notice = "This is not a valid provisioning profile."
-                } else if pendingInfo?.isExpired == true {
-                    notice = "Warning: this profile is expired."
-                } else {
-                    notice = nil
-                }
             }
         }
     }

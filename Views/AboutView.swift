@@ -1,21 +1,27 @@
 import SwiftUI
 
 struct AboutView: View {
+    private var appVersion: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.1"
+    }
+
+    private var appBuild: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
+    }
+
     var body: some View {
         List {
             Section {
                 VStack(spacing: 8) {
-                    if let icon = UIImage(named: "AppIcon") {
-                        Image(uiImage: icon)
-                            .resizable()
-                            .frame(width: 72, height: 72)
-                            .clipShape(RoundedRectangle(cornerRadius: 16))
-                    }
+                    Image("AboutIcon")
+                        .resizable()
+                        .frame(width: 72, height: 72)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
                     Text("NicheLoader")
                         .font(.largeTitle)
                         .bold()
                         .foregroundStyle(.purple)
-                    Text("Version \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.1")")
+                    Text("Version \(appVersion) (Build \(appBuild))")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }

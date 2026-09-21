@@ -3,6 +3,7 @@ import UniformTypeIdentifiers
 
 struct SigningView: View {
     @EnvironmentObject private var store: CertificateStore
+    @EnvironmentObject private var library: LibraryStore
     @Environment(\.dismiss) private var dismiss
 
     var app: LibraryApp
@@ -23,7 +24,12 @@ struct SigningView: View {
         NavigationStack {
             Form {
                 Section("App") {
-                    Text(app.name)
+                    Text(app.displayName)
+                    if !app.bundleID.isEmpty {
+                        Text(app.bundleID)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 Section("Certificate") {
                     if store.certificates.isEmpty {
@@ -56,14 +62,21 @@ struct SigningView: View {
                     }
                 }
                 if let message {
-                    Section { Text(message).foregroundStyle(.secondary) }
+                    Section("Status") {
+                        Text(message).foregroundStyle(.secondary)
+                    }
                 }
             }
             .navigationTitle("Sign app")
-            .fileImporter(isPresented: $showEntitlementsPicker, allowedContentTypes: [.nichePlist]) { result in
-                if case .success(let url) = result {
-                    entitlementsURL = url
-                    entitlementsName = url.lastPathComponent
+            .sheet(isPresented: $showEntitlementsPicker) {
+                DocumentPicker(types: [.nichePlist], allowsMultiple: false) { urls in
+                    showEntitlementsPicker = false
+                    if let url = urls.first {
+                        entitlementsURL = url
+                        entitlementsName = url.lastPathComponent
+                    }
+                } onCancel: {
+                    showEntitlementsPicker = false
                 }
             }
             .toolbar {
@@ -71,7 +84,8 @@ struct SigningView: View {
                     Button("Close") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Sign") { run() }.disabled(isSigning || selectedCertificate == nil)
+                    Button(isSigning ? "Signing…" : "Sign") { run() }
+                        .disabled(isSigning || selectedCertificate == nil)
                 }
             }
         }
@@ -85,31 +99,52 @@ struct SigningView: View {
     private func run() {
         guard let cert = selectedCertificate else { return }
         isSigning = true
-        message = nil
-        let request = SigningRequest(
-            appURL: app.url,
-            certificate: cert,
-            p12Path: store.p12URL(for: cert).path,
-            p12Password: store.password(for: cert),
-            provisionPath: store.provisionURL(for: cert).path,
-            options: SigningOptions(
-                removeProvisioningFile: removeProvisioning,
-                customName: customName,
-                customIdentifier: customIdentifier,
-                customVersion: customVersion,
-                entitlementsPath: entitlementsURL?.path ?? ""
-            )
-        )
+        message = "Unpacking…"
         DispatchQueue.global(qos: .userInitiated).async {
-            let outcome: String
+            func fail(_ text: String) {
+                DispatchQueue.main.async {
+                    message = text
+                    isSigning = false
+                }
+            }
+            let appDir: URL
+            do {
+                appDir = try library.prepareForSigning(app)
+            } catch {
+                fail(error.localizedDescription)
+                return
+            }
+            defer {
+                try? FileManager.default.removeItem(at: appDir.deletingLastPathComponent().deletingLastPathComponent())
+            }
+            DispatchQueue.main.async { message = "Signing…" }
+            let request = SigningRequest(
+                appURL: appDir,
+                certificate: cert,
+                p12Path: store.p12URL(for: cert).path,
+                p12Password: store.password(for: cert),
+                provisionPath: store.provisionURL(for: cert).path,
+                options: SigningOptions(
+                    removeProvisioningFile: removeProvisioning,
+                    customName: customName,
+                    customIdentifier: customIdentifier,
+                    customVersion: customVersion,
+                    entitlementsPath: entitlementsURL?.path ?? ""
+                )
+            )
             do {
                 try engine.sign(request)
-                outcome = "Signed successfully."
             } catch {
-                outcome = error.localizedDescription
+                fail(error.localizedDescription)
+                return
+            }
+            DispatchQueue.main.async { message = "Repacking…" }
+            if let error = library.finishSignedApp(appDir: appDir, originalName: app.displayName) {
+                fail(error)
+                return
             }
             DispatchQueue.main.async {
-                message = outcome
+                message = "Signed. Find it under Signed."
                 isSigning = false
             }
         }

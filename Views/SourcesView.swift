@@ -14,10 +14,12 @@ struct RepoSource: Identifiable, Hashable {
     var name: String
     var apps: [RepoApp] = []
     var failed: Bool = false
+    var iconURL: URL?
 }
 
 struct AltStoreFeed: Decodable {
     var name: String?
+    var iconURL: URL?
     var apps: [AltStoreApp]?
 }
 
@@ -74,9 +76,11 @@ final class SourcesModel: ObservableObject {
         URLSession.shared.dataTask(with: source.url) { data, _, _ in
             var apps: [RepoApp] = []
             var ok = false
+            var feedIcon: URL?
             if let data,
                let feed = try? JSONDecoder().decode(AltStoreFeed.self, from: data) {
                 ok = true
+                feedIcon = feed.iconURL
                 apps = (feed.apps ?? []).map { entry in
                     RepoApp(
                         id: entry.bundleIdentifier ?? entry.name ?? UUID().uuidString,
@@ -100,6 +104,9 @@ final class SourcesModel: ObservableObject {
                 if let i = self.sources.firstIndex(where: { $0.url == source.url }) {
                     self.sources[i].apps = apps
                     self.sources[i].failed = !ok
+                    if let icon = feedIcon {
+                        self.sources[i].iconURL = icon
+                    }
                 }
             }
         }.resume()
@@ -116,12 +123,86 @@ private struct SavedSource: Codable {
     var url: String
 }
 
+private struct RepoMenuView: View {
+    @ObservedObject var model: SourcesModel
+    @Binding var selectedRepo: String?
+    @Binding var isPresented: Bool
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Button {
+                    selectedRepo = nil
+                    isPresented = false
+                } label: {
+                    HStack {
+                        Image(systemName: "square.grid.2x2")
+                            .font(.title2)
+                            .foregroundStyle(.purple)
+                            .frame(width: 44, height: 44)
+                        Text("All repositories").font(.headline)
+                        Spacer()
+                        if selectedRepo == nil {
+                            Image(systemName: "checkmark").foregroundStyle(.purple)
+                        }
+                    }
+                }
+                ForEach(model.sources) { source in
+                    Button {
+                        selectedRepo = source.id
+                        isPresented = false
+                    } label: {
+                        HStack(spacing: 12) {
+                            AsyncImage(url: source.iconURL) { image in
+                                image.resizable()
+                            } placeholder: {
+                                Image(systemName: "globe.desk.fill")
+                                    .foregroundStyle(.purple)
+                            }
+                            .frame(width: 44, height: 44)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(source.name).font(.headline)
+                                Text("\(source.apps.count) apps")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            if selectedRepo == source.id {
+                                Image(systemName: "checkmark").foregroundStyle(.purple)
+                            }
+                        }
+                    }
+                    .swipeActions {
+                        Button(role: .destructive) {
+                            withAnimation {
+                                if selectedRepo == source.id { selectedRepo = nil }
+                                model.remove(source)
+                            }
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Repositories")
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { isPresented = false }
+                }
+            }
+        }
+    }
+}
+
 struct SourcesView: View {
     @StateObject private var model = SourcesModel()
     @State private var newURL = ""
     @State private var newName = ""
     @State private var downloading: String?
     @State private var downloadNotice: String?
+    @State private var showRepos = false
+    @State private var selectedRepo: String?
 
     var body: some View {
         NavigationStack {
@@ -140,7 +221,7 @@ struct SourcesView: View {
                     .disabled(newURL.isEmpty)
                 }
                 .animation(.default, value: model.sources)
-                ForEach(model.sources) { source in
+                ForEach(visibleSources) { source in
                     Section(source.name) {
                         if source.failed {
                             Text("Could not load this source.").foregroundStyle(.secondary)
@@ -185,8 +266,20 @@ struct SourcesView: View {
                 }
             }
             .animation(.default, value: model.sources)
-            .navigationTitle("Sources")
+            .navigationTitle(selectedTitle)
+            .navigationBarItems(
+                leading: Button(action: { showRepos = true }) {
+                    Image(systemName: "line.3.horizontal")
+                }
+            )
             .refreshable { model.fetchAll() }
+            .sheet(isPresented: $showRepos) {
+                RepoMenuView(
+                    model: model,
+                    selectedRepo: $selectedRepo,
+                    isPresented: $showRepos
+                )
+            }
             .overlay {
                 if model.isLoading { ProgressView().scaleEffect(1.4) }
             }
@@ -207,6 +300,17 @@ struct SourcesView: View {
                 }
             }
         }
+    }
+
+    private var visibleSources: [RepoSource] {
+        guard let id = selectedRepo else { return model.sources }
+        return model.sources.filter { $0.id == id }
+    }
+
+    private var selectedTitle: String {
+        guard let id = selectedRepo,
+              let source = model.sources.first(where: { $0.id == id }) else { return "Sources" }
+        return source.name
     }
 
     private func download(_ app: RepoApp) {

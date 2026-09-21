@@ -29,7 +29,8 @@ jobs:
             -derivedDataPath "$TMP" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGN_IDENTITY="" \
-            DEVELOPMENT_TEAM=""
+            DEVELOPMENT_TEAM="" \
+            CURRENT_PROJECT_VERSION="$GITHUB_RUN_NUMBER"
           ls -la "$TMP/Build/Products/Release-iphoneos/" || true
 
       - name: Package IPA

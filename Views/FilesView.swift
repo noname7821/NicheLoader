@@ -98,22 +98,23 @@ struct FilesView: View {
                     Button("Add", systemImage: "plus") { showImporter = true }
                 }
             }
-            .fileImporter(isPresented: $showImporter, allowedContentTypes: [.item], allowsMultipleSelection: true) { result in
-                if case .success(let urls) = result {
+            .sheet(isPresented: $showImporter) {
+                DocumentPicker(types: [.item], allowsMultiple: true) { urls in
+                    showImporter = false
                     var added = 0
                     var lastError: String?
                     for url in urls {
-                        let access = url.startAccessingSecurityScopedResource()
                         do {
                             try FileManager.default.copyItem(at: url, to: current.appendingPathComponent(url.lastPathComponent))
                             added += 1
                         } catch {
                             lastError = error.localizedDescription
                         }
-                        if access { url.stopAccessingSecurityScopedResource() }
                     }
                     notice = added == 0 ? (lastError.map { "Copy failed: \($0)" } ?? "Nothing selected.") : nil
                     withAnimation { reload() }
+                } onCancel: {
+                    showImporter = false
                 }
             }
             .onAppear(perform: reload)

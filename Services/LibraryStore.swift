@@ -1,32 +1,82 @@
 import Foundation
 import SwiftUI
+import Zip
 
 struct LibraryApp: Identifiable, Hashable {
     var id: String { url.path }
     var url: URL
-    var name: String { url.deletingPathExtension().lastPathComponent }
+    var info: IPAInfo?
     var size: Int64
+
+    var displayName: String { info?.displayName ?? url.deletingPathExtension().lastPathComponent }
+    var bundleID: String { info?.bundleID ?? "" }
+    var version: String { info?.version ?? "" }
 }
 
 final class LibraryStore: ObservableObject {
-    @Published private(set) var apps: [LibraryApp] = []
+    @Published private(set) var unsignedApps: [LibraryApp] = []
+    @Published private(set) var signedApps: [LibraryApp] = []
 
-    private let folder: URL
+    private let unsignedFolder: URL
+    private let signedFolder: URL
+    private let thumbnailFolder: URL
+    private let metaKey = "nicheloader.appmeta"
+    private var meta: [String: IPAInfo] = [:]
 
     init() {
         let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        folder = docs.appendingPathComponent("Apps", isDirectory: true)
-        try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        unsignedFolder = docs.appendingPathComponent("Apps", isDirectory: true)
+        signedFolder = docs.appendingPathComponent("Signed", isDirectory: true)
+        thumbnailFolder = docs.appendingPathComponent("Thumbnails", isDirectory: true)
+        for folder in [unsignedFolder, signedFolder, thumbnailFolder] {
+            try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        }
+        if let data = UserDefaults.standard.data(forKey: metaKey),
+           let decoded = try? JSONDecoder().decode([String: IPAInfo].self, from: data) {
+            meta = decoded
+        }
         refresh()
     }
 
-    func refresh() {
+    private func persistMeta() {
+        if let data = try? JSONEncoder().encode(meta) {
+            UserDefaults.standard.set(data, forKey: metaKey)
+        }
+    }
+
+    private func thumbnailURL(for info: IPAInfo) -> URL? {
+        guard let file = info.thumbnail else { return nil }
+        let url = thumbnailFolder.appendingPathComponent(file)
+        return FileManager.default.fileExists(atPath: url.path) ? url : nil
+    }
+
+    func thumbnail(for app: LibraryApp) -> URL? {
+        guard let info = app.info else { return nil }
+        return thumbnailURL(for: info)
+    }
+
+    private func scan(_ folder: URL) -> [LibraryApp] {
         let urls = (try? FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: [.fileSizeKey], options: .skipsHiddenFiles))?
             .filter { $0.pathExtension.lowercased() == "ipa" } ?? []
-        apps = urls.map { url in
+        return urls.map { url in
             let size = (try? url.resourceValues(forKeys: [.fileSizeKey]))?.fileSize ?? 0
-            return LibraryApp(url: url, size: Int64(size))
-        }.sorted { $0.name.lowercased() < $1.name.lowercased() }
+            var info = meta[url.path]
+            if info == nil {
+                info = IPAInspector.inspect(ipaURL: url, thumbnailDir: thumbnailFolder)
+                if let info {
+                    meta[url.path] = info
+                    persistMeta()
+                }
+            }
+            return LibraryApp(url: url, info: info, size: Int64(size))
+        }.sorted { $0.displayName.lowercased() < $1.displayName.lowercased() }
+    }
+
+    func refresh() {
+        unsignedApps = scan(unsignedFolder)
+        signedApps = scan(signedFolder)
+        meta = meta.filter { FileManager.default.fileExists(atPath: $0.key) }
+        persistMeta()
     }
 
     /// Returns nil on success, otherwise a message for the user.
@@ -37,7 +87,7 @@ final class LibraryStore: ObservableObject {
         guard source.pathExtension.lowercased() == "ipa" else {
             return "That file is not an .ipa."
         }
-        let dest = folder.appendingPathComponent(source.lastPathComponent)
+        let dest = unsignedFolder.appendingPathComponent(source.lastPathComponent)
         do {
             if FileManager.default.fileExists(atPath: dest.path) {
                 try FileManager.default.removeItem(at: dest)
@@ -50,9 +100,53 @@ final class LibraryStore: ObservableObject {
         }
     }
 
-    func remove(_ app: LibraryApp) {
+    func removeUnsigned(_ app: LibraryApp) {
         try? FileManager.default.removeItem(at: app.url)
         refresh()
+    }
+
+    func removeSigned(_ app: LibraryApp) {
+        try? FileManager.default.removeItem(at: app.url)
+        refresh()
+    }
+
+    /// Unzips an unsigned IPA and returns the .app directory for signing.
+    /// The caller owns the returned temp folder and must delete it after.
+    func prepareForSigning(_ app: LibraryApp) throws -> URL {
+        let work = FileManager.default.temporaryDirectory
+            .appendingPathComponent("sign-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: work, withIntermediateDirectories: true)
+        try Zip.unzipFile(app.url, destination: work, overwrite: true, password: nil)
+        let contents = try FileManager.default.contentsOfDirectory(at: work.appendingPathComponent("Payload"), includingPropertiesForKeys: nil, options: .skipsHiddenFiles)
+        guard let appDir = contents.first(where: { $0.pathExtension == "app" }) else {
+            throw SigningError.failed("No .app bundle found in this IPA.")
+        }
+        return appDir
+    }
+
+    /// Re-zips a signed .app directory into the Signed folder.
+    /// Returns nil on success, otherwise a message for the user.
+    @discardableResult
+    func finishSignedApp(appDir: URL, originalName: String) -> String? {
+        let work = appDir.deletingLastPathComponent().deletingLastPathComponent()
+        let payloadCopy = work.appendingPathComponent("IPARoot", isDirectory: true)
+            .appendingPathComponent("Payload", isDirectory: true)
+        do {
+            try FileManager.default.createDirectory(at: payloadCopy, withIntermediateDirectories: true)
+            try FileManager.default.copyItem(at: appDir, to: payloadCopy.appendingPathComponent(appDir.lastPathComponent))
+            let dest = signedFolder.appendingPathComponent("\(originalName)-signed.ipa")
+            try? FileManager.default.removeItem(at: dest)
+            try Zip.zipFiles(
+                paths: [payloadCopy],
+                zipFilePath: dest,
+                password: nil,
+                progress: nil
+            )
+            refresh()
+            return nil
+        } catch {
+            return "Repack failed: \(error.localizedDescription)"
+        }
     }
 
     static func formattedSize(_ bytes: Int64) -> String {
