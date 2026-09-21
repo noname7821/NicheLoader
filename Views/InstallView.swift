@@ -111,10 +111,8 @@ struct InstallView: View {
                 installer.ipaURL = ipa
                 installer.iconData = icon
                 try installer.start()
-                // Same as Ksign's http mode: prefer the LAN address so the
-                // system installer can reach us, localhost as fallback.
-                let host = DeviceIP.localAddress() ?? "127.0.0.1"
-                let base = "http://\(host):\(installer.port)"
+                // Loopback is exempt from App Transport Security, LAN IPs are not.
+                let base = "http://127.0.0.1:\(installer.port)"
                 installer.manifestData = Data(manifest(
                     bundleID: app.identifier,
                     version: app.version.isEmpty ? "1.0" : app.version,
@@ -155,8 +153,7 @@ struct InstallView: View {
             detail = "Could not build the install link."
             return
         }
-        let host = DeviceIP.localAddress() ?? "127.0.0.1"
-        guard let url = URL(string: "itms-services://?action=download-manifest&url=http://\(host):\(server.port)/manifest.plist") else {
+        guard let url = URL(string: "itms-services://?action=download-manifest&url=http://127.0.0.1:\(server.port)/manifest.plist") else {
             detail = "Could not build the install link."
             return
         }
