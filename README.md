@@ -25,7 +25,7 @@ Get the newest **`NicheLoader.ipa`** here:
 
 > ### [Releases →](https://github.com/noname7821/NicheLoader/releases)
 
-Install it with your favourite installer (TrollStore, AltStore, Sideloadly …).
+Install it directly on your iPhone with [**NicheLoader Site**](https://nicheloader-site.onrender.com/) open the link in Safari and tap Install. No computer needed.
 
 ## Features
 
