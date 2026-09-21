@@ -9,6 +9,7 @@ struct InstallView: View {
     @State private var phase: Phase = .packaging
     @State private var detail = ""
     @State private var server: LocalInstallServer?
+    @State private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
 
     var body: some View {
         NavigationStack {
@@ -36,10 +37,17 @@ struct InstallView: View {
             .padding(.top, 40)
             .navigationTitle("Install")
             .navigationBarItems(leading: Button("Close") {
+                endBackgroundTask()
                 server?.stop()
                 BackgroundAudioService.shared.stop()
                 dismiss()
             })
+            .onAppear(perform: start)
+            .onDisappear {
+                endBackgroundTask()
+                server?.stop()
+                BackgroundAudioService.shared.stop()
+            }
             .onAppear(perform: start)
             .onDisappear {
                 server?.stop()
@@ -128,8 +136,24 @@ struct InstallView: View {
         }
         phase = .installing
         detail = "Waiting for iOS… confirm on your Home Screen."
+        beginBackgroundTask()
         BackgroundAudioService.shared.start()
         UIApplication.shared.open(url)
+    }
+
+    private func beginBackgroundTask() {
+        endBackgroundTask()
+        backgroundTask = UIApplication.shared.beginBackgroundTask(withName: "NicheLoaderInstall") {
+            UIApplication.shared.endBackgroundTask(self.backgroundTask)
+            self.backgroundTask = .invalid
+        }
+    }
+
+    private func endBackgroundTask() {
+        if backgroundTask != .invalid {
+            UIApplication.shared.endBackgroundTask(backgroundTask)
+            backgroundTask = .invalid
+        }
     }
 
     private func manifest(bundleID: String, version: String, title: String, base: String) -> String {
