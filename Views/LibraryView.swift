@@ -28,8 +28,8 @@ struct LibraryView: View {
                 Button("Add", systemImage: "plus") { showImporter = true }
             }
             .fileImporter(isPresented: $showImporter, allowedContentTypes: [UTType(filenameExtension: "ipa") ?? .data]) { result in
-                if case .success(let urls) = result, let first = urls.first {
-                    library.importIPA(from: first)
+                if case .success(let url) = result {
+                    library.importIPA(from: url)
                 }
             }
             .sheet(item: $signTarget) { app in

@@ -70,14 +70,13 @@ private struct CertificateAddView: View {
             }
         }
         .fileImporter(isPresented: $showP12, allowedContentTypes: [p12Type]) { result in
-            if case .success(let urls) = result, let first = urls.first {
-                pendingP12 = first
+            if case .success(let url) = result {
+                pendingP12 = url
             }
         }
         .fileImporter(isPresented: $showProvision, allowedContentTypes: [provisionType]) { result in
             guard let p12 = pendingP12,
-                  case .success(let urls) = result,
-                  let provision = urls.first else { return }
+                  case .success(let provision) = result else { return }
             if store.add(name: certName, p12: p12, provision: provision, password: certPassword) {
                 notice = "Certificate saved."
                 certName = ""
