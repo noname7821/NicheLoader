@@ -4,6 +4,23 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                Section {
+                    HStack(spacing: 12) {
+                        Image("AboutIcon")
+                            .resizable()
+                            .frame(width: 52, height: 52)
+                            .clipShape(RoundedRectangle(cornerRadius: 13))
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("NicheLoader")
+                                .font(.headline)
+                            Text("by mintoo")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
+                .listRowBackground(EmptyView())
                 CertificateListView()
                 CertificateAddView()
                 Section {

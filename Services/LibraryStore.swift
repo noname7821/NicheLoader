@@ -21,6 +21,7 @@ final class LibraryStore: ObservableObject {
     private let signedFolder: URL
     private let thumbnailFolder: URL
     private let metaKey = "nicheloader.appmeta"
+    private let metaQueue = DispatchQueue(label: "com.filmeacc.nicheloader.meta")
     private var meta: [String: IPAInfo] = [:]
 
     init() {
@@ -38,9 +39,25 @@ final class LibraryStore: ObservableObject {
         refresh()
     }
 
-    private func persistMeta() {
-        if let data = try? JSONEncoder().encode(meta) {
-            UserDefaults.standard.set(data, forKey: metaKey)
+    private func metaGet(_ path: String) -> IPAInfo? {
+        metaQueue.sync { meta[path] }
+    }
+
+    private func metaSet(_ info: IPAInfo, for path: String) {
+        metaQueue.sync {
+            meta[path] = info
+            if let data = try? JSONEncoder().encode(meta) {
+                UserDefaults.standard.set(data, forKey: metaKey)
+            }
+        }
+    }
+
+    private func metaPrune(to paths: Set<String>) {
+        metaQueue.sync {
+            meta = meta.filter { paths.contains($0.key) }
+            if let data = try? JSONEncoder().encode(meta) {
+                UserDefaults.standard.set(data, forKey: metaKey)
+            }
         }
     }
 
@@ -60,23 +77,30 @@ final class LibraryStore: ObservableObject {
             .filter { $0.pathExtension.lowercased() == "ipa" } ?? []
         return urls.map { url in
             let size = (try? url.resourceValues(forKeys: [.fileSizeKey]))?.fileSize ?? 0
-            var info = meta[url.path]
-            if info == nil {
-                info = IPAInspector.inspect(ipaURL: url, thumbnailDir: thumbnailFolder)
-                if let info {
-                    meta[url.path] = info
-                    persistMeta()
-                }
-            }
-            return LibraryApp(url: url, info: info, size: Int64(size))
+            return LibraryApp(url: url, info: metaGet(url.path), size: Int64(size))
         }.sorted { $0.displayName.lowercased() < $1.displayName.lowercased() }
     }
 
     func refresh() {
         unsignedApps = scan(unsignedFolder)
         signedApps = scan(signedFolder)
-        meta = meta.filter { FileManager.default.fileExists(atPath: $0.key) }
-        persistMeta()
+        let allPaths = Set((unsignedApps + signedApps).map(\.url.path))
+        metaPrune(to: allPaths)
+        DispatchQueue.global(qos: .utility).async {
+            var changed = false
+            for url in allPaths where self.metaGet(url) == nil {
+                if let info = IPAInspector.inspect(ipaURL: URL(fileURLWithPath: url), thumbnailDir: self.thumbnailFolder) {
+                    self.metaSet(info, for: url)
+                    changed = true
+                }
+            }
+            if changed {
+                DispatchQueue.main.async {
+                    self.unsignedApps = self.scan(self.unsignedFolder)
+                    self.signedApps = self.scan(self.signedFolder)
+                }
+            }
+        }
     }
 
     /// Returns nil on success, otherwise a message for the user.

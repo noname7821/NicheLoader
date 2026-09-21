@@ -38,7 +38,14 @@ struct FilesView: View {
                                     reload()
                                 }
                             } label: {
-                                Label(entry.name, systemImage: "folder.fill")
+                                HStack {
+                                    Label(entry.name, systemImage: "folder.fill")
+                                        .foregroundStyle(.purple)
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
                             }
                             .swipeActions {
                                 Button(role: .destructive) { delete(entry) } label: {
@@ -46,12 +53,18 @@ struct FilesView: View {
                                 }
                             }
                         } else {
-                            Label(entry.name, systemImage: "doc.fill")
-                                .swipeActions {
-                                    Button(role: .destructive) { delete(entry) } label: {
-                                        Label("Delete", systemImage: "trash")
-                                    }
+                            HStack {
+                                Label(entry.name, systemImage: "doc.fill")
+                                Spacer()
+                                Text(entry.sizeText)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .swipeActions {
+                                Button(role: .destructive) { delete(entry) } label: {
+                                    Label("Delete", systemImage: "trash")
                                 }
+                            }
                         }
                     }
                     .transition(.slide)
@@ -139,10 +152,10 @@ struct FilesView: View {
 
     private func reload() {
         try? FileManager.default.createDirectory(at: current, withIntermediateDirectories: true)
-        let urls = (try? FileManager.default.contentsOfDirectory(at: current, includingPropertiesForKeys: [.isDirectoryKey], options: .skipsHiddenFiles)) ?? []
+        let urls = (try? FileManager.default.contentsOfDirectory(at: current, includingPropertiesForKeys: [.isDirectoryKey, .fileSizeKey], options: .skipsHiddenFiles)) ?? []
         entries = urls.map { url in
-            let isDir = (try? url.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory ?? false
-            return FileEntry(url: url, isDirectory: isDir)
+            let values = try? url.resourceValues(forKeys: [.isDirectoryKey, .fileSizeKey])
+            return FileEntry(url: url, isDirectory: values?.isDirectory ?? false, size: Int64(values?.fileSize ?? 0))
         }.sorted { $0.name.lowercased() < $1.name.lowercased() }
     }
 
@@ -156,5 +169,12 @@ private struct FileEntry: Identifiable, Hashable {
     var id: String { url.path }
     var url: URL
     var isDirectory: Bool
+    var size: Int64
     var name: String { url.lastPathComponent }
+    var sizeText: String {
+        if isDirectory { return "" }
+        if size >= 1_048_576 { return String(format: "%.1f MB", Double(size) / 1_048_576) }
+        if size >= 1024 { return "\(size / 1024) KB" }
+        return "\(size) B"
+    }
 }

@@ -84,7 +84,15 @@ struct SigningView: View {
                         }
                     }
                 }
-                if let message {
+                if isSigning {
+                    Section {
+                        HStack {
+                            ProgressView()
+                            Text(message ?? "Working…")
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                } else if let message {
                     Section("Status") {
                         Text(message).foregroundStyle(.secondary)
                     }
