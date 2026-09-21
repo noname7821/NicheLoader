@@ -49,7 +49,7 @@ final class CertificateStore: ObservableObject {
     @discardableResult
     func add(name: String, p12: URL, provision: URL, password: String) -> String? {
         let cleanName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !cleanName.isEmpty else { return false }
+        guard !cleanName.isEmpty else { return "Enter a name first." }
         let id = UUID().uuidString
         let p12Name = id + ".p12"
         let provName = id + ".mobileprovision"

@@ -43,7 +43,7 @@ struct LibraryView: View {
             }
             .navigationTitle("Library")
             .navigationBarItems(trailing: Button("Add", systemImage: "plus") { showImporter = true })
-            .fileImporter(isPresented: $showImporter, allowedContentTypes: [.data], allowsMultipleSelection: true) { result in
+            .fileImporter(isPresented: $showImporter, allowedContentTypes: [.nicheIPA], allowsMultipleSelection: true) { result in
                 if case .success(let urls) = result {
                     var errors: [String] = []
                     var added = 0

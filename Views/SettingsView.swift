@@ -103,7 +103,7 @@ private struct CertificateAddView: View {
         }
         .fileImporter(
             isPresented: Binding(get: { pickerTarget != nil }, set: { if !$0 { pickerTarget = nil } }),
-            allowedContentTypes: [.data]
+            allowedContentTypes: [pickerTarget == .p12 ? .nicheP12 : .nicheProvision]
         ) { result in
             guard let target = pickerTarget else { return }
             pickerTarget = nil
@@ -138,6 +138,10 @@ private struct CertificateAddView: View {
         guard let p12 = pendingP12, let provision = pendingProvision else { return }
         guard let info = ProvisionInfo.parse(url: provision), !info.isExpired else {
             notice = "Cannot save: the provisioning profile is invalid or expired."
+            return
+        }
+        guard P12Validator.verify(at: p12, password: certPassword) else {
+            notice = "Bad password. Check the p12 password and try again."
             return
         }
         if let error = store.add(name: certName, p12: p12, provision: provision, password: certPassword) {
