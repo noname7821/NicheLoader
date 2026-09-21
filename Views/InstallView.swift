@@ -10,6 +10,8 @@ struct InstallView: View {
     @State private var detail = ""
     @State private var server: LocalInstallServer?
     @State private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
+    @State private var baseURL = ""
+    @State private var serverOK = false
 
     var body: some View {
         NavigationStack {
@@ -31,6 +33,11 @@ struct InstallView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(.purple)
+                }
+                if !baseURL.isEmpty {
+                    Text(baseURL)
+                        .font(.caption2)
+                        .foregroundStyle(serverOK ? .green : .secondary)
                 }
                 Spacer()
             }
@@ -93,7 +100,7 @@ struct InstallView: View {
 
     private func start() {
         guard server == nil else { return }
-        DispatchQueue.global(qos: .userInitiated).async {
+        Task.detached(priority: .userInitiated) {
             do {
                 let ipa = try library.packageSignedApp(app)
                 let icon = library.iconURL(for: app, signed: true)
@@ -104,20 +111,35 @@ struct InstallView: View {
                 installer.ipaURL = ipa
                 installer.iconData = icon
                 try installer.start()
+                // Same as Ksign's http mode: prefer the LAN address so the
+                // system installer can reach us, localhost as fallback.
+                let host = DeviceIP.localAddress() ?? "127.0.0.1"
+                let base = "http://\(host):\(installer.port)"
                 installer.manifestData = Data(manifest(
                     bundleID: app.identifier,
                     version: app.version.isEmpty ? "1.0" : app.version,
                     title: app.name,
-                    base: "http://127.0.0.1:\(installer.port)"
+                    base: base
                 ).utf8)
                 installer.onPayloadServed = {
                     phase = .finished
                     detail = "iOS is installing the app. Watch your Home Screen."
                 }
+                // Self-test: prove inside this screen that the server answers.
+                let testURL = URL(string: "\(base)/manifest.plist")!
+                let (testData, _) = try await URLSession.shared.data(from: testURL)
+                let ok = !testData.isEmpty
                 DispatchQueue.main.async {
                     self.server = installer
-                    self.phase = .ready
-                    self.detail = "Tap Install now. Keep this screen open until it starts."
+                    self.baseURL = base
+                    self.serverOK = ok
+                    if ok {
+                        self.phase = .ready
+                        self.detail = "Tap Install now. Keep this screen open until it starts."
+                    } else {
+                        self.phase = .failed
+                        self.detail = "Server self-test failed. Try again."
+                    }
                 }
             } catch {
                 DispatchQueue.main.async {
@@ -129,8 +151,12 @@ struct InstallView: View {
     }
 
     private func openInstaller() {
-        guard let server, server.port != 0,
-              let url = URL(string: "itms-services://?action=download-manifest&url=http://127.0.0.1:\(server.port)/manifest.plist") else {
+        guard let server, server.port != 0 else {
+            detail = "Could not build the install link."
+            return
+        }
+        let host = DeviceIP.localAddress() ?? "127.0.0.1"
+        guard let url = URL(string: "itms-services://?action=download-manifest&url=http://\(host):\(server.port)/manifest.plist") else {
             detail = "Could not build the install link."
             return
         }
