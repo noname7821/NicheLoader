@@ -34,6 +34,11 @@ struct InstallView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(.purple)
+                    Button("Install via HTTPS") {
+                        openExternalInstaller()
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.purple)
                 }
                 if !baseURL.isEmpty {
                     Text(baseURL)
@@ -185,6 +190,28 @@ struct InstallView: View {
             detail = "Could not build the install link."
             return
         }
+        launchInstall(url: url)
+    }
+
+    /// Same as Ksign's external flow: the manifest comes from palera.in
+    /// over HTTPS, only the IPA itself loads from this device.
+    private func openExternalInstaller() {
+        guard let server, server.port != 0 else {
+            detail = "Could not build the install link."
+            return
+        }
+        let fetch = "http://\(chosenHost):\(server.port)/app.ipa"
+        let inner = "https://api.palera.in/genPlist?bundleid=\(app.identifier)&name=\(app.name)&version=\(app.version.isEmpty ? "1.0" : app.version)&fetchurl=\(fetch)"
+        guard let once = inner.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+              let twice = once.addingPercentEncoding(withAllowedCharacters: .alphanumerics),
+              let url = URL(string: "itms-services://?action=download-manifest&url=\(twice)") else {
+            detail = "Could not build the install link."
+            return
+        }
+        launchInstall(url: url)
+    }
+
+    private func launchInstall(url: URL) {
         phase = .installing
         detail = "Waiting for iOS… confirm on your Home Screen."
         beginBackgroundTask()
