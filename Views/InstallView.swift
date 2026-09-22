@@ -34,11 +34,6 @@ struct InstallView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(.purple)
-                    Button("Install via HTTPS") {
-                        openExternalInstaller()
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(.purple)
                 }
                 if !baseURL.isEmpty {
                     Text(baseURL)
@@ -181,21 +176,9 @@ struct InstallView: View {
         }
     }
 
+    /// Main install path: the manifest comes from palera.in over HTTPS,
+    /// only the IPA itself loads from this device.
     private func openInstaller() {
-        guard let server, server.port != 0 else {
-            detail = "Could not build the install link."
-            return
-        }
-        guard let url = URL(string: "itms-services://?action=download-manifest&url=http://\(chosenHost):\(server.port)/manifest.plist") else {
-            detail = "Could not build the install link."
-            return
-        }
-        launchInstall(url: url)
-    }
-
-    /// Same as Ksign's external flow: the manifest comes from palera.in
-    /// over HTTPS, only the IPA itself loads from this device.
-    private func openExternalInstaller() {
         guard let server, server.port != 0 else {
             detail = "Could not build the install link."
             return
