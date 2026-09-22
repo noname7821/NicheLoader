@@ -184,7 +184,7 @@ struct InstallView: View {
             return
         }
         let fetch = "http://\(chosenHost):\(server.port)/app.ipa"
-        let inner = "https://api.palera.in/genPlist?bundleid=\(app.identifier)&name=\(app.name)&version=\(app.version.isEmpty ? "1.0" : app.version)&fetchurl=\(fetch)"
+        let inner = "https://nicheloader-site.onrender.com/genPlist?bundleid=\(app.identifier)&name=\(app.name)&version=\(app.version.isEmpty ? "1.0" : app.version)&fetchurl=\(fetch)"
         guard let once = inner.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
               let twice = once.addingPercentEncoding(withAllowedCharacters: .alphanumerics),
               let url = URL(string: "itms-services://?action=download-manifest&url=\(twice)") else {
