@@ -143,29 +143,23 @@ struct InstallView: View {
                     phase = .finished
                     detail = "iOS is installing the app. Watch your Home Screen."
                 }
-                // Self-test: loopback is ATS-exempt, so a real HTTP fetch
-                // proves the server answers. For LAN hosts the TCP probe
-                // above already proved reachability (URLSession would be
-                // blocked by ATS, the system installer is not).
-                var ok = host == "127.0.0.1"
-                if ok {
-                    let testURL = URL(string: "\(base)/manifest.plist")!
-                    let (testData, _) = try await URLSession.shared.data(from: testURL)
-                    ok = !testData.isEmpty
+                // The TCP probe above already proved this host is reachable
+                // (raw sockets, like the system installer uses). A real HTTP
+                // fetch is only a bonus and never fails the setup, because
+                // URLSession has its own extra rules (ATS).
+                if host == "127.0.0.1",
+                   let testURL = URL(string: "\(base)/manifest.plist"),
+                   let (testData, _) = try? await URLSession.shared.data(from: testURL),
+                   testData.isEmpty {
+                    throw InstallServerError.noPort
                 }
-                let reachable = ok
                 DispatchQueue.main.async {
                     self.server = installer
                     self.baseURL = base
                     self.chosenHost = host
-                    self.serverOK = reachable
-                    if reachable {
-                        self.phase = .ready
-                        self.detail = "Tap Install now. Keep this screen open until it starts."
-                    } else {
-                        self.phase = .failed
-                        self.detail = "Server self-test failed. Try again."
-                    }
+                    self.serverOK = true
+                    self.phase = .ready
+                    self.detail = "Tap Install now. Keep this screen open until it starts."
                 }
             } catch {
                 DispatchQueue.main.async {
