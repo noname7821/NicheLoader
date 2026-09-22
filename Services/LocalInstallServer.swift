@@ -136,10 +136,13 @@ enum InstallServerError: LocalizedError {
 
 /// LAN address of this device (Wi-Fi or cellular), for the OTA links.
 enum DeviceIP {
-    static func localAddress() -> String? {
+    /// All candidate addresses: Wi-Fi first, then cellular, then loopback.
+    static func candidates() -> [String] {
+        var wifi: [String] = []
+        var cell: [String] = []
         var ifaddr: UnsafeMutablePointer<ifaddrs>?
         defer { freeifaddrs(ifaddr) }
-        guard getifaddrs(&ifaddr) == 0 else { return nil }
+        guard getifaddrs(&ifaddr) == 0 else { return ["127.0.0.1"] }
         var ptr = ifaddr
         while ptr != nil {
             let interface = ptr!.pointee
@@ -149,12 +152,59 @@ enum DeviceIP {
                     var host = [CChar](repeating: 0, count: Int(NI_MAXHOST))
                     if getnameinfo(interface.ifa_addr, socklen_t(interface.ifa_addr.pointee.sa_len),
                                    &host, socklen_t(host.count), nil, 0, NI_NUMERICHOST) == 0 {
-                        return String(cString: host)
+                        let ip = String(cString: host)
+                        if name == "en0" {
+                            wifi.append(ip)
+                        } else {
+                            cell.append(ip)
+                        }
                     }
                 }
             }
             ptr = interface.ifa_next
         }
-        return nil
+        return wifi + cell + ["127.0.0.1"]
+    }
+
+    static func localAddress() -> String? {
+        candidates().first
+    }
+
+    /// Raw TCP probe (no ATS involved): can this device actually open
+    /// a socket to host:port? Calls back on the main queue.
+    static func probe(host: String, port: Int, timeout: TimeInterval = 3, completion: @escaping (Bool) -> Void) {
+        guard let portValue = UInt16(exactly: port),
+              let endpointPort = NWEndpoint.Port(rawValue: portValue) else {
+            completion(false)
+            return
+        }
+        let endpointHost: NWEndpoint.Host
+        if let v4 = IPv4Address(host) {
+            endpointHost = .ipv4(v4)
+        } else {
+            endpointHost = .name(host, nil)
+        }
+        let connection = NWConnection(host: endpointHost, port: endpointPort, using: .tcp)
+        var done = false
+        func finish(_ ok: Bool) {
+            guard !done else { return }
+            done = true
+            connection.cancel()
+            DispatchQueue.main.async { completion(ok) }
+        }
+        connection.stateUpdateHandler = { state in
+            switch state {
+            case .ready:
+                finish(true)
+            case .failed, .cancelled:
+                finish(false)
+            default:
+                break
+            }
+        }
+        connection.start(queue: .global())
+        DispatchQueue.global().asyncAfter(deadline: .now() + timeout) {
+            finish(false)
+        }
     }
 }
